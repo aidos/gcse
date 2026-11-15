@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>English Language: the two papers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F0; --surface:#FFFFFF; --ink:#1F2A2E; --muted:#56676C; --line:#C6D2CF; --soft:#E2E9E7;
+  --c-p1read:#3E6FA8; --c-p1write:#2C7F69; --c-p2read:#7454AD; --c-p2write:#AE4459; --c-tool:#36525E;
+  --sans:"Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+    --c-p1read:#7FA8DA; --c-p1write:#6CC2A8; --c-p2read:#B39AE3; --c-p2write:#E38699; --c-tool:#A9C3CC;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+  --c-p1read:#7FA8DA; --c-p1write:#6CC2A8; --c-p2read:#B39AE3; --c-p2write:#E38699; --c-tool:#A9C3CC;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:1.0625rem;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:62rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0 0 .4rem;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 2rem;max-width:42rem}
+
+/* ---- tree ---- */
+.root{display:flex;justify-content:center}
+.root span{background:var(--ink);color:var(--bg);font-weight:700;padding:.55rem 1.1rem;border-radius:999px}
+.trunk{width:2px;height:1.4rem;background:var(--line);margin:0 auto}
+.papers{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;position:relative}
+.papers::before{content:"";position:absolute;top:0;left:25%;right:25%;height:2px;background:var(--line)}
+.paper{position:relative;padding-top:1.4rem}
+.paper::before{content:"";position:absolute;top:0;left:50%;width:2px;height:1.4rem;background:var(--line)}
+.plabel{text-align:center;border:2px dashed var(--line);border-radius:12px;padding:.5rem .75rem;background:var(--bg)}
+.plabel b{display:block;font-size:1.1rem}
+.plabel span{font-size:.88rem;color:var(--muted)}
+.kids{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:.75rem;position:relative}
+.kids::before{content:"";position:absolute;top:0;left:25%;right:25%;height:2px;background:var(--line)}
+.kids li{position:relative;padding-top:1.2rem;display:flex}
+.kids li::before{content:"";position:absolute;top:0;left:50%;width:2px;height:1.2rem;background:var(--line)}
+.paper .trunk{height:1.2rem}
+
+.node{all:unset;box-sizing:border-box;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.3rem;
+  background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:.75rem .5rem .7rem;transition:border-color .15s, background .15s}
+.node:hover{border-color:var(--c)}
+.node:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.node[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+.node .name{font-weight:700;color:var(--c);font-size:1.05rem;line-height:1.2}
+.node .what{font-size:.85rem;color:var(--muted);line-height:1.3}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:.15rem}
+.dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--c);display:block}
+.dots i.on{background:var(--c)}
+
+.extras{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin:1.5rem 0 2.25rem}
+.pill{all:unset;cursor:pointer;box-sizing:border-box;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:.45rem 1rem;font-weight:700;color:var(--c);font-size:.95rem}
+.pill:hover{border-color:var(--c)}
+.pill:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.pill[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+
+@media (max-width:720px){
+  .root,.wrap>nav>.trunk,.papers::before,.paper::before{display:none}
+  .papers{grid-template-columns:1fr;gap:1.25rem}
+  .paper{padding-top:0}
+  .extras{justify-content:flex-start}
+}
+
+/* ---- panels ---- */
+.panel-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem 1rem;margin:0 0 1rem;border-left:5px solid var(--c);padding-left:.85rem}
+.panel-head h2{margin:0;font-size:1.5rem;color:var(--c)}
+.panel-head .from{font-size:.85rem;color:var(--muted)}
+.panel-head p{margin:0;color:var(--muted);flex-basis:100%}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin:0 0 1rem}
+.facts.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem}
+.fact h3{margin:0 0 .25rem;font-size:.85rem;color:var(--muted);font-weight:400}
+.fact p{margin:0}
+.fact .eg{display:block;margin-top:.4rem;font-size:.92rem;color:var(--muted)}
+@media (max-width:720px){.facts,.facts.two{grid-template-columns:1fr}}
+.words{display:flex;flex-wrap:wrap;gap:.4rem;margin:.35rem 0 0;padding:0;list-style:none}
+.words li{border:2px solid var(--c);color:var(--c);border-radius:999px;padding:.05rem .6rem;font-weight:700;font-size:.92rem}
+
+.sub{font-size:1.1rem;margin:1.5rem 0 .6rem}
+.rows{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto;gap:.4rem 1.5rem;padding:1rem 1.15rem;border-top:1px solid var(--line);align-items:start}
+.row:first-child{border-top:0}
+.row h4{margin:0;font-size:1.05rem}
+.row .aka{display:block;margin-top:.2rem;font-size:.85rem;color:var(--muted)}
+.q{margin:.45rem 0 0;font-style:italic;border-left:3px solid var(--c);padding-left:.7rem}
+.explain{background:var(--soft);border-radius:8px;padding:.6rem .8rem}
+.explain p{margin:0}
+.explain .eg{display:block;margin-top:.35rem;font-size:.92rem;font-style:italic}
+.tick{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--muted);cursor:pointer;white-space:nowrap;padding-top:.15rem}
+.tick input{width:1.25rem;height:1.25rem;accent-color:var(--c);cursor:pointer;margin:0}
+.row.done h4::after{content:" ✓";color:var(--c)}
+@media (max-width:720px){
+  .row{grid-template-columns:1fr auto}
+  .row .explain{grid-column:1 / -1;grid-row:2}
+  .row .tick{grid-column:2;grid-row:1}
+}
+.remember{margin:1rem 0 0;padding:.85rem 1rem;border:2px dashed var(--c);border-radius:12px}
+.remember strong{color:var(--c)}
+
+/* numbered structure */
+.flow{list-style:none;margin:0;padding:0;counter-reset:fl;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.flow li{counter-increment:fl;display:grid;grid-template-columns:2.2rem minmax(0,12rem) minmax(0,1fr);gap:.3rem 1rem;padding:.8rem 1.1rem;border-top:1px solid var(--line);align-items:start}
+.flow li:first-child{border-top:0}
+.flow li::before{content:counter(fl);font-weight:700;color:var(--surface);background:var(--c);border-radius:999px;width:1.7rem;height:1.7rem;display:grid;place-items:center;font-size:.9rem}
+.flow b{display:block}
+.flow .job{font-size:.88rem;color:var(--muted)}
+.flow .line{font-style:italic;background:var(--soft);border-radius:8px;padding:.45rem .7rem}
+@media (max-width:620px){.flow li{grid-template-columns:2.2rem 1fr}.flow .line{grid-column:2}}
+
+/* mountain */
+.mountain{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.75rem .75rem .25rem;margin:0 0 1rem;overflow-x:auto}
+.mountain svg{display:block;width:100%;min-width:520px;height:auto}
+.mountain text{font-family:var(--sans);fill:var(--ink)}
+.mountain .lbl{font-size:15px;font-weight:700}
+.mountain .part{font-size:13px;fill:var(--muted)}
+
+/* spot / use table */
+.su{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.su th,.su td{text-align:left;padding:.75rem .95rem;border-top:1px solid var(--line);vertical-align:top}
+.su thead th{border-top:0;font-size:.9rem}
+.su thead th:nth-child(2){color:var(--c-p1read)}
+.su thead th:nth-child(3){color:var(--c-p2write)}
+.su td:first-child{font-weight:700;width:24%}
+.su .src{display:block;font-size:.82rem;color:var(--muted);margin-top:.15rem}
+.su-wrap{overflow-x:auto}
+
+/* jargon */
+.jargon{margin-top:3rem}
+.jargon h2{font-size:1.3rem;margin:0 0 .3rem}
+.jargon>p{color:var(--muted);margin:0 0 1rem}
+.jargon dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.75rem}
+.jargon div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.75rem .95rem}
+.jargon dt{font-weight:700}
+.jargon dd{margin:.15rem 0 0;color:var(--muted);font-size:.95rem}
+
+.tools{display:flex;gap:.75rem;flex-wrap:wrap;margin:1.25rem 0 0}
+.btn{all:unset;cursor:pointer;font-size:.9rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem}
+.btn:hover{color:var(--ink);border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  nav,.tools,.tick{display:none!important}
+  .panel{display:block!important;margin-bottom:1.5rem}
+  .row,.flow li{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>English Language, as two papers</h1>
+  <p class="lede">The whole course is two exams. In each one you read something, then write something. That makes four jobs. Pick one to see what it asks and the tools for it.</p>
+
+  <nav aria-label="Topics">
+    <div class="root"><span>English Language</span></div>
+    <div class="trunk"></div>
+    <div class="papers" id="papers"></div>
+    <div class="extras" id="extras"></div>
+  </nav>
+
+  <div id="panels"></div>
+
+  <div class="tools">
+    <button class="btn" id="showAll" type="button">Show everything</button>
+    <button class="btn" id="reset" type="button">Clear my ticks</button>
+  </div>
+
+  <section class="jargon" aria-labelledby="jh">
+    <h2 id="jh">Same thing, different names</h2>
+    <p>The sheets use a lot of labels. Here’s what they mean in plain words.</p>
+    <dl>
+      <div><dt>Paper = component</dt><dd>Same thing. Paper 1 and Component 1 are one exam.</dd></div>
+      <div><dt>Transactional writing</dt><dd>Writing for real life: an article, a letter, a speech.</dd></div>
+      <div><dt>Imaginative writing</dt><dd>Writing a story.</dd></div>
+      <div><dt>Explicit / implicit</dt><dd>Said outright / hinted at. Implicit = reading between the lines.</dd></div>
+      <div><dt>Objective / subjective</dt><dd>Based on facts / based on opinions.</dd></div>
+      <div><dt>Logos, ethos, pathos</dt><dd>Facts, experts, feelings.</dd></div>
+      <div><dt>Story mountain = Freytag’s pyramid</dt><dd>Same diagram, two names.</dd></div>
+      <div><dt>Denouement = resolution</dt><dd>How the story ends up.</dd></div>
+      <div><dt>Protagonist</dt><dd>The main character.</dd></div>
+      <div><dt>Pathetic fallacy</dt><dd>When the weather matches the mood. Nothing to do with “pathetic”.</dd></div>
+    </dl>
+  </section>
+</main>
+
+<script>
+const PAPERS = [
+  { title:"Paper 1", sub:"Non-fiction, 60% of your grade", kids:["p1read","p1write"] },
+  { title:"Paper 2", sub:"Fiction, 40% of your grade", kids:["p2read","p2write"] },
+];
+
+const SECTIONS = {
+ p1read:{ name:"Reading", what:"a newspaper article", from:"Paper 1, Module 2", title:"Reading an article",
+   intro:"You read real-life writing and work out what the writer thinks, and how you can tell.",
+   facts:[
+     ["The text you studied","Explorers or boys messing about? by Steven Morris, from The Guardian. Two explorers crash their helicopter into the sea off Antarctica and have to be rescued, at the taxpayer’s expense."],
+     ["What you’ll be asked","Find facts that are stated. Work out things that are only hinted. Explain how the writer shows his opinion."],
+     ["Words for the writer’s tone","WORDS"],
+   ],
+   words:["critical","sceptical","mocking","exasperated"],
+   split:[
+     ["Explicit: it says it","The men had to be rescued, and the rescue cost a lot of money.","It’s written down. You can point to it."],
+     ["Implicit: it hints it","The writer thinks they were foolish.","He never writes “foolish”. You work it out from his word choices and tone."],
+   ],
+   rows:[
+     {t:"Headline built on a contrast", aka:"Also a rhetorical question.", q:"Explorers or boys messing about?",
+      e:"Starts with a grand word, “explorers”, then swaps it for a childish one, “boys”. The second option is the one he believes.", eg:"Effect: mocks the men before the article even starts."},
+     {t:"Irony", aka:"Saying one thing, meaning the opposite.", q:"“trusty” helicopter",
+      e:"He puts “trusty” in inverted commas. It’s the helicopter that just crashed.", eg:"Effect: a sarcastic wink to the reader."},
+     {t:"Borrowing someone else’s words", aka:"Using a quotation.",
+      e:"The “boys messing about” line was said by one explorer’s wife. Morris puts it in the headline so the mockery comes from her, not him.", eg:"Effect: he looks fair while still making his point."},
+     {t:"Facts that sting", aka:"Logos, used to criticise.", q:"tens of thousands of pounds",
+      e:"A real figure, placed to make the reader feel annoyed about who paid.", eg:"Effect: turns the story from adventure into waste."},
+     {t:"Loaded word choice", aka:"Connotations.", q:"farce",
+      e:"A farce is a silly comedy. Calling a past expedition that makes the men sound ridiculous.", eg:"Effect: humour that undermines them."},
+   ],
+   tick:"I can spot this",
+   remember:"For any “how does the writer show…” question: name the tone word, find the word choice that proves it, say the effect." },
+
+ p1write:{ name:"Writing", what:"to persuade", from:"Paper 1, Module 3", title:"Writing to persuade",
+   intro:"Usually an opinion article. Persuasion has a fixed shape, so you can plan it the same way every time.",
+   facts:[
+     ["P: Purpose","Why am I writing? To persuade, argue, advise…"],
+     ["A: Audience","Who is reading? Teenagers, parents, a head teacher…"],
+     ["F: Form","What is it? An article, letter, speech… Each has its own layout."],
+   ],
+   factsHead:"Before you write: PAF",
+   flow:[
+     ["Headline","Grab attention.","Plastic isn’t fantastic: ban it from our canteen"],
+     ["Hook","Interest the reader straight away.","Look inside any school bin at 1pm. What do you see?"],
+     ["Counter argument","Show the other side fairly.","Some say plastic is cheap and convenient."],
+     ["Dismissal","Explain why your side is stronger.","But cheap for whom? The oceans pay the real price."],
+     ["Main argument","Use logos, ethos and pathos.","Facts, an expert, and a picture that makes the reader feel something."],
+     ["Conclusion","End with a call to action.","Bring a bottle. Ask your head. Start tomorrow."],
+   ],
+   rows:[
+     {t:"Logos: facts", aka:"Statistics and evidence.", e:"Makes you sound reliable.", eg:"Plastic production has doubled."},
+     {t:"Ethos: experts", aka:"Trusted sources.", e:"Borrows someone else’s authority.", eg:"According to the WWF…"},
+     {t:"Pathos: feelings", aka:"Emotive language.", e:"Makes the reader care.", eg:"Imagine a turtle trapped in plastic."},
+     {t:"Rhetorical question", e:"A question the reader answers in their head, your way.", eg:"Would you swim in a sea of rubbish?"},
+     {t:"Direct address", e:"Talk straight to the reader with “you”.", eg:"You can change this."},
+     {t:"Rule of three", e:"Three ideas in a row sound complete and memorable.", eg:"Cheap, careless and completely avoidable."},
+     {t:"Repetition", e:"Repeat a key word so it sticks.", eg:"Every bottle. Every bag. Every day."},
+     {t:"Short sentence", e:"After a long sentence, a short one hits hard.", eg:"It has to stop."},
+   ],
+   rowsHead:"Your toolkit",
+   tick:"I can use this",
+   remember:"Try to fit in several tools, but the structure matters more. Six steps, in order." },
+
+ p2read:{ name:"Reading", what:"a story extract", from:"Paper 2, Module 5", title:"Reading a story extract",
+   intro:"You read fiction and explain how the writer creates a feeling, like fear or tension.",
+   facts:[
+     ["The text you studied","A chapter of The Woman in Black by Susan Hill. The chapter is called “Whistle and I’ll Come to You”. That’s why the sheet has two titles."],
+     ["What happens","A storm wakes Arthur Kipps in a lonely house on a marsh. He hears a child crying outside, senses someone in the house, and his torch breaks. Only Spider the dog calms him."],
+     ["Genre: Gothic","WORDS"],
+   ],
+   words:["isolated place","storm and darkness","something supernatural","fear and doubt"],
+   rows:[
+     {t:"Pathetic fallacy and simile", aka:"Weather matches the mood.", q:"The house felt like a ship at sea, battered by the gale that came roaring across the open marsh.",
+      e:"The house is a small boat in a storm. “Roaring” makes the wind sound like an animal.", eg:"Effect: Kipps feels alone and helpless."},
+     {t:"Sound imagery and repetition", aka:"Auditory imagery.", q:"a cry, that familiar cry of desperation and anguish, a cry for help from a child",
+      e:"“Cry” three times, like hearing it again and again.", eg:"Effect: urgent and upsetting. We feel for the child."},
+     {t:"Rhetorical question", q:"And the person who had gone by, and who was now in this house with me?",
+      e:"He asks himself, and can’t answer.", eg:"Effect: we’re inside his panic with him."},
+     {t:"First person", aka:"Narrated with “I”.", q:"At that moment, I began to doubt my own reality.",
+      e:"We only know what he knows, so we doubt along with him.", eg:"Effect: a sensible man starts to lose his grip."},
+     {t:"Tension", aka:"Suspense.",
+      e:"The torch breaks and he’s in total darkness. Not knowing what’s there is scarier than seeing it.", eg:"Effect: the most frightening moment in the extract."},
+   ],
+   tick:"I can spot this",
+   remember:"Gothic fear comes from what the character can’t see or explain. Look for the moments where he loses control." },
+
+ p2write:{ name:"Writing", what:"your own story", from:"Paper 2, Module 4", title:"Writing a story",
+   intro:"Every story climbs a mountain and comes down the other side. Plan the five stops before you write.",
+   facts:[
+     ["Genre","The type of story: Gothic, sci-fi, adventure… Each has its own usual ingredients."],
+     ["Blended genre","Mixing two types. A Gothic story set on a spaceship is Gothic + sci-fi."],
+   ],
+   two:true,
+   mountain:true,
+   rows:[
+     {t:"1. Exposition and inciting incident", aka:"Beginning. Exposition = setting the scene.",
+      e:"Who, where, what normal life is like. Then the spark that starts the trouble.", eg:"Maya house-sits her aunt’s empty cottage on the cliffs. At midnight the old phone rings, though it was cut off years ago."},
+     {t:"2. Rising action", aka:"Middle.",
+      e:"Problems get bigger. Tension builds.", eg:"It rings every night, louder. She finds it unplugged. Wet footprints lead to the door."},
+     {t:"3. Climax", aka:"Middle: the peak.",
+      e:"The biggest, scariest moment. The turning point.", eg:"She answers. Her own voice says: “Don’t open the door.”"},
+     {t:"4. Falling action", aka:"Ending.",
+      e:"What happens straight after. Things calm down.", eg:"At dawn the knocking stops. The porch has fallen into the sea."},
+     {t:"5. Resolution", aka:"Ending. Also called denouement.",
+      e:"How things end up. The character has changed.", eg:"Maya leaves, but keeps the phone. She’s learned to trust the warning inside her."},
+   ],
+   rowsHead:"The five stops, with one example story",
+   tick:"I can plan this",
+   remember:"Borrow the Gothic tools from Paper 2 Reading: weather, sound, first person, darkness. Reading and writing use the same toolbox." },
+};
+
+const EXTRAS = [
+ { id:"skills", name:"Reading skills", c:"tool" },
+ { id:"spotuse", name:"Spot it, use it", c:"tool" },
+];
+
+const SKILL_ROWS = [
+  {t:"Skim", aka:"For the main idea.", e:"Read fast to get the gist. Headline, first lines of paragraphs.", eg:"“It’s about two explorers who crashed and cost taxpayers money.”"},
+  {t:"Scan", aka:"For one detail.", e:"Hunt for a specific word, name or number. Don’t read everything.", eg:"“Where did they crash?” Look for place names."},
+  {t:"Paraphrase", aka:"In your own words.", e:"Say the same meaning differently. Use the Four Rs below.", eg:""},
+];
+const FOUR_RS = [
+  ["Reword","Swap words for synonyms.","plunged → crashed"],
+  ["Rearrange","Change the sentence order.","Start with the rescue instead of the crash."],
+  ["Realise","Some words stay the same.","Names, places, dates: Antarctica stays Antarctica."],
+  ["Recheck","Does it still mean the same?","Read both versions side by side."],
+];
+
+const SPOT_USE = [
+  ["Rhetorical question","Article headline: “Explorers or boys messing about?”","Hook for a persuasive article","Paper 1"],
+  ["Repetition","“a cry, that familiar cry…”","Persuasion: “Every bottle. Every bag.” Story: build dread","Both"],
+  ["Contrast","Explorers vs boys","Counter argument, then dismissal","Paper 1"],
+  ["Emotive language","“desperation and anguish”","Pathos in your article","Both"],
+  ["Facts and figures","“tens of thousands of pounds”","Logos in your article","Paper 1"],
+  ["Weather and setting","The house like a ship in a storm","Your story’s opening","Paper 2"],
+  ["First person","Kipps narrates with “I”","Your story, or “I believe…” in an article","Both"],
+  ["Short sentences","Tension in the Gothic extract","Impact in persuasion, fear in a story","Both"],
+  ["Story structure","The torch breaking is the extract’s climax","Plan your story on the mountain","Paper 2"],
+];
+
+/* ---------- helpers ---------- */
+const KEY = "englang-tree-ticks";
+let ticks = {};
+try { ticks = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { ticks = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(ticks)); } catch(e){} };
+const col = id => `var(--c-${SECTIONS[id] ? id : "tool"})`;
+
+function rowsHTML(owner, rows, tick){
+  return `<ul class="rows">${rows.map((r,i) => {
+    const k = owner + ":" + i;
+    return `<li class="row${ticks[k] ? " done" : ""}">
+      <div><h4>${r.t}</h4>${r.aka ? `<span class="aka">${r.aka}</span>` : ""}${r.q ? `<p class="q">“${r.q}”</p>` : ""}</div>
+      <div class="explain"><p>${r.e}</p>${r.eg ? `<span class="eg">${r.eg}</span>` : ""}</div>
+      <label class="tick"><input type="checkbox" data-k="${k}"${ticks[k] ? " checked" : ""}> ${tick}</label>
+    </li>`; }).join("")}</ul>`;
+}
+
+/* ---------- nav ---------- */
+document.getElementById("papers").innerHTML = PAPERS.map(p => `
+  <div class="paper">
+    <div class="plabel"><b>${p.title}</b><span>${p.sub}</span></div>
+    <div class="trunk"></div>
+    <ul class="kids">${p.kids.map(id => `<li><button class="node" type="button" style="--c:${col(id)}" data-id="${id}" aria-pressed="false">
+      <span class="name">${SECTIONS[id].name}</span><span class="what">${SECTIONS[id].what}</span><span class="dots" aria-hidden="true"></span></button></li>`).join("")}</ul>
+  </div>`).join("");
+document.getElementById("extras").innerHTML = EXTRAS.map(x =>
+  `<button class="pill" type="button" style="--c:var(--c-tool)" data-id="${x.id}" aria-pressed="false">${x.name}</button>`).join("");
+
+/* ---------- panels ---------- */
+const panelsEl = document.getElementById("panels");
+function addPanel(id, html, c){
+  const sec = document.createElement("section");
+  sec.className = "panel"; sec.id = "panel-" + id; sec.hidden = true;
+  sec.style.setProperty("--c", c); sec.innerHTML = html; panelsEl.appendChild(sec);
+}
+
+const MOUNTAIN = `<div class="mountain" role="img" aria-label="Story mountain: exposition, rising action, climax, falling action, resolution">
+<svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg">
+  <path d="M20 205 L80 190 L200 125 L320 35 L440 110 L560 190 L620 205" fill="none" stroke="var(--line)" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M20 205 L80 190 L200 125" fill="none" stroke="var(--c-p1read)" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M200 125 L320 35 L330 41" fill="none" stroke="var(--c-p2write)" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M330 41 L440 110 L560 190 L620 205" fill="none" stroke="var(--c-p2read)" stroke-width="6" stroke-linejoin="round"/>
+  <g>
+    <circle cx="80" cy="190" r="11" fill="var(--c-p1read)"/><text x="80" y="195" text-anchor="middle" class="lbl" style="fill:var(--surface)">1</text>
+    <circle cx="200" cy="125" r="11" fill="var(--c-p2write)"/><text x="200" y="130" text-anchor="middle" class="lbl" style="fill:var(--surface)">2</text>
+    <circle cx="320" cy="35" r="11" fill="var(--c-p2write)"/><text x="320" y="40" text-anchor="middle" class="lbl" style="fill:var(--surface)">3</text>
+    <circle cx="440" cy="110" r="11" fill="var(--c-p2read)"/><text x="440" y="115" text-anchor="middle" class="lbl" style="fill:var(--surface)">4</text>
+    <circle cx="560" cy="190" r="11" fill="var(--c-p2read)"/><text x="560" y="195" text-anchor="middle" class="lbl" style="fill:var(--surface)">5</text>
+  </g>
+  <text x="80" y="168" text-anchor="middle" class="lbl">Exposition</text>
+  <text x="160" y="105" text-anchor="end" class="lbl">Rising action</text>
+  <text x="320" y="18" text-anchor="middle" class="lbl">Climax</text>
+  <text x="462" y="95" class="lbl">Falling action</text>
+  <text x="560" y="168" text-anchor="middle" class="lbl">Resolution</text>
+  <text x="110" y="238" text-anchor="middle" class="part" style="fill:var(--c-p1read)">Beginning</text>
+  <text x="320" y="238" text-anchor="middle" class="part" style="fill:var(--c-p2write)">Middle</text>
+  <text x="530" y="238" text-anchor="middle" class="part" style="fill:var(--c-p2read)">Ending</text>
+</svg></div>`;
+
+Object.entries(SECTIONS).forEach(([id, s]) => {
+  const factCard = ([h, p]) => p === "WORDS"
+    ? `<div class="fact"><h3>${h}</h3><ul class="words">${s.words.map(w => `<li>${w}</li>`).join("")}</ul></div>`
+    : `<div class="fact"><h3>${h}</h3><p>${p}</p></div>`;
+  let html = `<div class="panel-head"><h2>${s.title}</h2><span class="from">${s.from}</span><p>${s.intro}</p></div>`;
+  if (s.factsHead) html += `<h3 class="sub" style="margin-top:0">${s.factsHead}</h3>`;
+  html += `<div class="facts${s.two ? " two" : ""}">${s.facts.map(factCard).join("")}</div>`;
+  if (s.split) html += `<h3 class="sub">Explicit or implicit?</h3><div class="facts two">${s.split.map(([h,p,eg]) =>
+     `<div class="fact"><h3>${h}</h3><p>${p}</p><span class="eg">${eg}</span></div>`).join("")}</div>`;
+  if (s.flow) html += `<h3 class="sub">The six steps, in order</h3><ol class="flow">${s.flow.map(([b,j,l]) =>
+     `<li><div><b>${b}</b><span class="job">${j}</span></div><div class="line">${l}</div></li>`).join("")}</ol>`;
+  if (s.mountain) html += `<h3 class="sub">The story mountain</h3>${MOUNTAIN}`;
+  html += `<h3 class="sub">${s.rowsHead || "Techniques to know"}</h3>${rowsHTML(id, s.rows, s.tick)}`;
+  html += `<p class="remember"><strong>Remember:</strong> ${s.remember}</p>`;
+  addPanel(id, html, col(id));
+});
+
+addPanel("skills", `
+  <div class="panel-head"><h2>Reading skills</h2><span class="from">Module 1</span><p>Three ways to read. You’ll use them on both papers.</p></div>
+  ${rowsHTML("skills", SKILL_ROWS, "I can do this")}
+  <h3 class="sub">Paraphrasing: the Four Rs</h3>
+  <ol class="flow">${FOUR_RS.map(([b,j,l]) => `<li><div><b>${b}</b><span class="job">${j}</span></div><div class="line">${l}</div></li>`).join("")}</ol>
+  <p class="remember"><strong>Remember:</strong> Skim = main idea. Scan = one detail. Paraphrase = own words.</p>`, "var(--c-tool)");
+
+addPanel("spotuse", `
+  <div class="panel-head"><h2>Spot it, use it</h2><p>Every technique has two jobs. When you read, you spot it. When you write, you use it. So there’s really only one list to learn.</p></div>
+  <div class="su-wrap"><table class="su">
+    <thead><tr><th>Technique</th><th>Spot it when reading</th><th>Use it when writing</th></tr></thead>
+    <tbody>${SPOT_USE.map(([t,s,u,p]) => `<tr><td>${t}<span class="src">${p}</span></td><td>${s}</td><td>${u}</td></tr>`).join("")}</tbody>
+  </table></div>
+  <p class="remember"><strong>Remember:</strong> if you can explain why a writer used a technique, you know how to use it yourself.</p>`, "var(--c-tool)");
+
+/* ---------- state ---------- */
+const ALL = [...Object.keys(SECTIONS), ...EXTRAS.map(x => x.id)];
+function drawDots(){
+  Object.entries(SECTIONS).forEach(([id, s]) => {
+    const done = s.rows.filter((_,i) => ticks[id + ":" + i]).length;
+    const btn = document.querySelector(`.node[data-id="${id}"]`);
+    btn.querySelector(".dots").innerHTML = s.rows.map((_,i) => `<i class="${i < done ? "on" : ""}"></i>`).join("");
+    btn.setAttribute("aria-label", `${s.title}: ${done} of ${s.rows.length} ticked`);
+  });
+}
+let showingAll = false;
+function show(id){
+  showingAll = false;
+  document.getElementById("showAll").textContent = "Show everything";
+  if (!ALL.includes(id)) id = "p1read";
+  ALL.forEach(k => {
+    document.getElementById("panel-" + k).hidden = k !== id;
+    document.querySelector(`[data-id="${k}"]`).setAttribute("aria-pressed", k === id ? "true" : "false");
+  });
+}
+document.querySelector("nav").addEventListener("click", e => {
+  const btn = e.target.closest("[data-id]"); if (!btn) return;
+  if (location.hash === "#" + btn.dataset.id) show(btn.dataset.id);
+  else location.hash = btn.dataset.id;
+});
+window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+panelsEl.addEventListener("change", e => {
+  const k = e.target.dataset.k; if (!k) return;
+  if (e.target.checked) ticks[k] = true; else delete ticks[k];
+  e.target.closest(".row").classList.toggle("done", e.target.checked);
+  save(); drawDots();
+});
+document.getElementById("showAll").addEventListener("click", ev => {
+  showingAll = !showingAll;
+  if (showingAll){
+    ALL.forEach(k => {
+      const p = document.getElementById("panel-" + k);
+      p.hidden = false; p.style.marginBottom = "2.5rem";
+      document.querySelector(`[data-id="${k}"]`).setAttribute("aria-pressed","false");
+    });
+    ev.target.textContent = "Show one at a time";
+  } else show(location.hash.slice(1));
+});
+document.getElementById("reset").addEventListener("click", () => {
+  ticks = {}; save();
+  document.querySelectorAll("input[data-k]").forEach(i => i.checked = false);
+  document.querySelectorAll(".row.done").forEach(r => r.classList.remove("done"));
+  drawDots();
+});
+drawDots();
+show(location.hash.slice(1));
+</script>
+</body>
+</html>

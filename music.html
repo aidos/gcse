@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Music: the concerto through time</title>
+<!--
+  REVISION MAP BASE TEMPLATE
+  ==========================
+  Everything you change lives in the DATA section inside <script> near the bottom.
+  The CSS and the engine below it are shared across every subject page; leave them alone
+  unless a subject genuinely needs something new (then add it, don't fork it).
+
+  Nav shapes (set DATA.nav.shape):
+    "tree"   : root pill -> one row of branch nodes            (e.g. Maths: 5 big ideas)
+    "chain"  : numbered row of nodes -> optional hub node below (e.g. Inspector Calls: questioning order -> Eva)
+    "groups" : root pill -> labelled groups, each with 2-3 nodes (e.g. English Language: Paper 1 / Paper 2 -> Read / Write)
+  Extras (DATA.nav.extras) render as pills under the shape: cross-cutting views like Themes, Essay, Skills.
+
+  Section blocks (in order, any combination) : see BLOCK TYPES comment in DATA.
+  Only "rows" blocks are tickable; their ticks fill the dots on that section's node.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F0; --surface:#FFFFFF; --ink:#1F2A2E; --muted:#56676C; --line:#C6D2CF; --soft:#E2E9E7;
+  /* six section colours + a neutral for tools/extras */
+  --c1:#3E6FA8; --c2:#2C7F69; --c3:#7454AD; --c4:#AE4459; --c5:#A96A1E; --c6:#7A6A36; --c-tool:#36525E;
+  --sans:"Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
+  --mono:"Atkinson Hyperlegible Mono", ui-monospace, "Consolas", "Menlo", monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+    --c1:#7FA8DA; --c2:#6CC2A8; --c3:#B39AE3; --c4:#E38699; --c5:#E2A85E; --c6:#CDBB86; --c-tool:#A9C3CC;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+  --c1:#7FA8DA; --c2:#6CC2A8; --c3:#B39AE3; --c4:#E38699; --c5:#E2A85E; --c6:#CDBB86; --c-tool:#A9C3CC;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:1.0625rem;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:62rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0 0 .4rem;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 2rem;max-width:42rem}
+
+/* ---------- nav: shared pieces ---------- */
+.root{display:flex;justify-content:center}
+.root span{background:var(--ink);color:var(--bg);font-weight:700;padding:.55rem 1.1rem;border-radius:999px}
+.trunk{width:2px;height:1.4rem;background:var(--line);margin:0 auto}
+.cap{font-size:.9rem;color:var(--muted);margin:0 0 .6rem;text-align:center}
+.node{all:unset;box-sizing:border-box;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.3rem;
+  background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:.75rem .5rem .7rem;transition:border-color .15s, background .15s}
+.node:hover{border-color:var(--c)}
+.node:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.node[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+.node .num{font-size:.8rem;font-weight:700;color:var(--surface);background:var(--c);border-radius:999px;width:1.5rem;height:1.5rem;display:grid;place-items:center}
+.node .name{font-weight:700;color:var(--c);font-size:1.05rem;line-height:1.2}
+.node .what{font-size:.85rem;color:var(--muted);line-height:1.3}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:.15rem}
+.dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--c);display:block}
+.dots i.on{background:var(--c)}
+.extras{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin:1.5rem 0 2.25rem}
+.pill{all:unset;cursor:pointer;box-sizing:border-box;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:.45rem 1rem;font-weight:700;color:var(--c);font-size:.95rem}
+.pill:hover{border-color:var(--c)}
+.pill:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.pill[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+nav:not(:has(.extras:not(:empty))){margin-bottom:2.25rem}
+
+/* row of nodes hanging DOWN from a rail (tree, groups) */
+.hang{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:.75rem;position:relative}
+.hang::before{content:"";position:absolute;top:0;left:calc(50% / var(--n));right:calc(50% / var(--n));height:2px;background:var(--line)}
+.hang>li{position:relative;padding-top:1.3rem;display:flex}
+.hang>li::before{content:"";position:absolute;top:0;left:50%;width:2px;height:1.3rem;background:var(--line)}
+
+/* chain: nodes joined UP into a rail that drops to a hub */
+.chainrow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:.75rem;position:relative}
+.chainrow.has-hub::after{content:"";position:absolute;bottom:0;left:calc(50% / var(--n));right:calc(50% / var(--n));height:2px;background:var(--line)}
+.chainrow>li{position:relative;display:flex}
+.chainrow.has-hub>li{padding-bottom:1.3rem}
+.chainrow.has-hub>li::after{content:"";position:absolute;bottom:0;left:50%;width:2px;height:1.3rem;background:var(--line)}
+.hub{display:flex;justify-content:center}
+.hub .node{flex:0 1 20rem}
+
+/* groups */
+.groups{display:grid;grid-template-columns:repeat(var(--g),1fr);gap:1.5rem;position:relative}
+.groups::before{content:"";position:absolute;top:0;left:calc(50% / var(--g));right:calc(50% / var(--g));height:2px;background:var(--line)}
+.group{position:relative;padding-top:1.4rem}
+.group::before{content:"";position:absolute;top:0;left:50%;width:2px;height:1.4rem;background:var(--line)}
+.glabel{text-align:center;border:2px dashed var(--line);border-radius:12px;padding:.5rem .75rem}
+.glabel b{display:block;font-size:1.1rem}
+.glabel span{font-size:.88rem;color:var(--muted)}
+.group .trunk{height:1.2rem}
+
+@media (max-width:720px){
+  .root{justify-content:flex-start}
+  .trunk{margin-left:1.5rem;height:.9rem}
+  .cap{text-align:left}
+  /* tree + chain become a vertical file-tree */
+  .shape-tree .hang,.shape-chain .chainrow{grid-template-columns:1fr;gap:.6rem;padding-left:1.5rem}
+  .shape-tree .hang::before,.shape-chain .chainrow.has-hub::after{top:0;bottom:0;left:1.5rem;right:auto;width:2px;height:auto}
+  .shape-tree .hang::before{bottom:1.6rem}
+  .shape-tree .hang>li,.shape-chain .chainrow>li{padding:0 0 0 1.25rem}
+  .shape-tree .hang>li::before,.shape-chain .chainrow.has-hub>li::after{top:50%;bottom:auto;left:0;width:1.25rem;height:2px}
+  .shape-tree .node,.shape-chain .node{flex-direction:row;flex-wrap:wrap;text-align:left;align-items:center;padding:.6rem .85rem;gap:.15rem .65rem}
+  .shape-tree .node .what,.shape-chain .node .what{flex:1 1 9rem}
+  .shape-tree .dots,.shape-chain .dots{justify-content:flex-start;flex-basis:100%;margin:0}
+  .hub{justify-content:flex-start}.hub .node{flex:1}
+  /* groups stack, each keeps its own small tree */
+  .shape-groups .root,.shape-groups>.trunk,.groups::before,.group::before{display:none}
+  .groups{grid-template-columns:1fr;gap:1.25rem}
+  .group{padding-top:0}
+  .group .trunk{margin:0 auto}
+  .extras{justify-content:flex-start}
+}
+
+/* ---------- panels ---------- */
+.panel-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem 1rem;margin:0 0 1rem;border-left:5px solid var(--c);padding-left:.85rem}
+.panel-head h2{margin:0;font-size:1.5rem;color:var(--c)}
+.panel-head .from{font-size:.85rem;color:var(--muted)}
+.panel-head p{margin:0;color:var(--muted);flex-basis:100%}
+.sub{font-size:1.1rem;margin:1.5rem 0 .6rem}
+.panel>.sub:first-of-type{margin-top:.5rem}
+
+.facts{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:.75rem;margin:0 0 1rem}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem}
+.fact h3{margin:0 0 .25rem;font-size:.85rem;color:var(--muted);font-weight:400}
+.fact p{margin:0}
+.fact ul:not(.words){margin:.2rem 0 0;padding-left:1.1rem}
+.fact .eg{display:block;margin-top:.4rem;font-size:.92rem;color:var(--muted)}
+.words{display:flex;flex-wrap:wrap;gap:.4rem;margin:.35rem 0 0;padding:0;list-style:none}
+.words li{border:2px solid var(--c);color:var(--c);border-radius:999px;padding:.05rem .6rem;font-weight:700;font-size:.92rem}
+.badge{display:inline-block;font-weight:700;border-radius:999px;padding:.1rem .65rem;font-size:.95rem;border:2px solid currentColor}
+.badge.yes{color:var(--c2)} .badge.no{color:var(--c4)} .badge.part{color:var(--c5)}
+@media (max-width:720px){.facts{grid-template-columns:1fr}}
+
+.rows{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto;gap:.4rem 1.5rem;padding:1rem 1.15rem;border-top:1px solid var(--line);align-items:start}
+.row:first-child{border-top:0}
+.row h4{margin:0;font-size:1.05rem}
+.row .aka{display:block;margin-top:.2rem;font-size:.85rem;color:var(--muted)}
+.row .q{margin:.45rem 0 0;font-style:italic;border-left:3px solid var(--c);padding-left:.7rem}
+.row .q.lead{margin-top:0;font-size:1.08rem}
+.explain{background:var(--soft);border-radius:8px;padding:.6rem .8rem;overflow-x:auto}
+.explain p{margin:0}
+.explain .eg{display:block;margin-top:.35rem;font-size:.92rem;font-style:italic}
+.explain .method{display:block;margin-top:.35rem;font-size:.88rem;color:var(--muted)}
+.explain.maths{font-family:var(--mono);line-height:1.9}
+.explain.maths .step{display:block;white-space:nowrap}
+.explain.maths .ans{font-weight:600;color:var(--c)}
+.explain.maths .note{font-family:var(--sans);font-size:.85rem;color:var(--muted);display:block;line-height:1.4;white-space:normal}
+.tick{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--muted);cursor:pointer;white-space:nowrap;padding-top:.15rem}
+.tick input{width:1.25rem;height:1.25rem;accent-color:var(--c);cursor:pointer;margin:0}
+.row.done h4::after,.row.done .q.lead::after{content:" ✓";font-style:normal;color:var(--c)}
+@media (max-width:720px){
+  .row{grid-template-columns:1fr auto}
+  .row .explain{grid-column:1 / -1;grid-row:2}
+  .row .tick{grid-column:2;grid-row:1}
+}
+
+.flow{list-style:none;margin:0;padding:0;counter-reset:fl;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.flow li{counter-increment:fl;display:grid;grid-template-columns:2.2rem minmax(0,12rem) minmax(0,1fr);gap:.3rem 1rem;padding:.8rem 1.1rem;border-top:1px solid var(--line);align-items:start}
+.flow li:first-child{border-top:0}
+.flow li::before{content:counter(fl);font-weight:700;color:var(--surface);background:var(--c);border-radius:999px;width:1.7rem;height:1.7rem;display:grid;place-items:center;font-size:.9rem}
+.flow b{display:block}
+.flow .job{font-size:.88rem;color:var(--muted)}
+.flow .line{font-style:italic;background:var(--soft);border-radius:8px;padding:.45rem .7rem}
+@media (max-width:620px){.flow li{grid-template-columns:2.2rem 1fr}.flow .line{grid-column:2}}
+
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{text-align:left;padding:.75rem .95rem;border-top:1px solid var(--line);vertical-align:top}
+.tbl thead th{border-top:0;font-size:.9rem;color:var(--muted)}
+.tbl td:first-child{font-weight:700}
+.tbl .src{display:block;font-size:.82rem;color:var(--muted);font-weight:400;margin-top:.15rem}
+
+.checks{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.checks li{border-top:1px solid var(--line);padding:.65rem 1rem}
+.checks li:first-child{border-top:0}
+.checks label{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer}
+.checks input{width:1.2rem;height:1.2rem;margin:.2rem 0 0;accent-color:var(--c);flex:none}
+
+.remember{margin:1rem 0 0;padding:.85rem 1rem;border:2px dashed var(--c);border-radius:12px}
+.remember strong{color:var(--c)}
+
+/* inline helpers usable in any text */
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;margin:0 .1em;font-size:.92em}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .2em}
+.fr>span:last-child{padding:0 .2em}
+sup{font-size:.7em;line-height:0}
+
+/* ---------- jargon + tools ---------- */
+.jargon{margin-top:3rem}
+.jargon h2{font-size:1.3rem;margin:0 0 .3rem}
+.jargon>p{color:var(--muted);margin:0 0 1rem}
+.jargon dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.75rem}
+.jargon div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.75rem .95rem}
+.jargon dt{font-weight:700}
+.jargon dd{margin:.15rem 0 0;color:var(--muted);font-size:.95rem}
+.tools{display:flex;gap:.75rem;flex-wrap:wrap;margin:1.25rem 0 0}
+.btn{all:unset;cursor:pointer;font-size:.9rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem}
+.btn:hover{color:var(--ink);border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  nav,.tools,.tick{display:none!important}
+  .panel{display:block!important;margin-bottom:1.5rem}
+  .row,.flow li{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1 id="title"></h1>
+  <p class="lede" id="lede"></p>
+  <nav id="nav" aria-label="Topics"></nav>
+  <div id="panels"></div>
+  <div class="tools">
+    <button class="btn" id="showAll" type="button">Show everything</button>
+    <button class="btn" id="reset" type="button">Clear my ticks</button>
+  </div>
+  <section class="jargon" id="jargon" aria-labelledby="jh"></section>
+</main>
+
+<script>
+/* ---------- inline helpers for content strings ---------- */
+const f  = (a,b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;   // stacked fraction
+const s  = t => `<span class="step">${t}</span>`;          // maths working line   (use with style:"maths")
+const a  = t => `<span class="step ans">${t}</span>`;      // maths answer line
+const nt = t => `<span class="note">${t}</span>`;          // maths side note
+
+/* =====================================================================
+   DATA : the only part to edit
+   =====================================================================
+   BLOCK TYPES (inside a section's "blocks" array):
+     {type:"facts", head?, cards:[{h, p? , list?:[..], words?:[..], badge?:["yes"|"no"|"part","Label"], eg?}]}
+         2-3 summary cards. words = coloured chips. badge = Accepts/Refuses style label.
+     {type:"rows", head?, tick:"I can do this", style?:"maths", items:[{t, aka?, q?, lead?:true, e, eg?, m?}]}
+         The tickable list. t = title, aka = "Also called…", q = quotation (no quote marks),
+         lead:true shows the quote as the headline instead of t, e = explanation, eg = example, m = method/effect line.
+         style:"maths" puts e in a monospace working box; build e with s()/a()/nt().
+     {type:"flow", head?, steps:[[title, job, exampleLine], …]}   numbered steps: ONLY for real sequences
+     {type:"table", head?, cols:[…], rows:[[…], …], srcCol?:index}  srcCol = small grey note under first cell
+     {type:"checks", head?, items:[…]}                            tickable self-check list (not counted in dots)
+     {type:"remember", label?:"Remember", text}
+     {type:"html", html}                                          escape hatch for a one-off (e.g. an SVG diagram)
+   Colours: c1–c6 for sections, "tool" for extras/cross-cutting views.
+   ===================================================================== */
+const DATA = {
+  storageKey: "revision-map-music-concerto",
+  title: "Music: the concerto through time",
+  lede: "Three periods, one idea: a soloist and an orchestra taking turns. Each period changes the same few things (volume, texture, harmony, instruments). Pick a period, or start with what every concerto has.",
+
+  nav: {
+    shape: "chain",
+    caption: "In time order. Each period grows out of the one before.",
+    groups: [ { label:"", nodes:["baroque","classical","romantic"] } ],
+    hub: "concerto",
+    extras: ["spot","tools"],
+  },
+
+  sections: {
+    /* ---------------- 1. Baroque ---------------- */
+    baroque: { name:"Baroque", what:"c1600–c1750, Bach", c:"c1", from:"Module 2 sheet",
+      title:"Baroque concerto", intro:"Busy, woven-together lines, with a harpsichord holding everything up.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"When and who", p:"About 1600 to 1750.", list:["Bach","Handel","Vivaldi"]},
+          {h:"Sounds to listen for", words:["harpsichord","terraced dynamics","polyphonic","trills"]},
+          {h:"The piece you studied", p:"Bach, Brandenburg Concerto No. 4 in G major.", eg:"The small solo group is a violin and two recorders. Bach wrote six Brandenburg Concertos."},
+        ]},
+        {type:"rows", head:"Spot it", tick:"I can spot this", items:[
+          {t:"Concerto grosso", aka:"The small group = concertino. The orchestra = ripieno.", e:"Instead of one soloist, a small group plays against the orchestra.", eg:"In Brandenburg 4, the violin and two recorders against the strings."},
+          {t:"Basso continuo", aka:"Also called continuo.", e:"A keyboard and a bass instrument play the bass line and fill in the chords, all the way through.", eg:"Usually harpsichord and cello."},
+          {t:"Harpsichord", e:"A keyboard that plucks its strings. A piano hits them instead.", eg:"Listen for a bright, plucky, jangling sound underneath."},
+          {t:"Terraced dynamics", e:"Loud or soft, nothing in between. The volume jumps like a light switch, never slides like a dimmer.", eg:"A loud passage, then suddenly a soft one, like an echo."},
+          {t:"Polyphonic texture", aka:"Also called contrapuntal.", e:"Two or more tunes at once, all equally important.", eg:"No single line is “the tune”."},
+          {t:"Fugue", e:"One tune enters in each part in turn, then the parts weave together.", eg:"The last movement of Brandenburg 4 starts as a fugue."},
+          {t:"Trill", aka:"An ornament (the sheet says decoration).", e:"Flick quickly between two neighbouring notes.", eg:"C-D-C-D-C-D, fast."},
+          {t:"Mordent", aka:"An ornament. Upper or lower.", e:"Play the note, the one next to it, then the note again, very quickly.", eg:"Upper: C-D-C. Lower: C-B-C."},
+        ]},
+        {type:"rows", head:"Explain it", tick:"I can explain this", items:[
+          {t:"Ritornello", aka:"Named on the Module 3 sheet, but not explained there.", e:"The orchestra’s opening tune keeps coming back between the solo sections, often in pieces and in new keys.", m:"Compare rondo (Classical): there the main tune comes back whole and in the home key."},
+        ]},
+        {type:"remember", text:"Baroque = harpsichord, volume that jumps rather than swells, and several tunes woven together."},
+      ]},
+
+    /* ---------------- 2. Classical ---------------- */
+    classical: { name:"Classical", what:"c1750–c1820, Mozart", c:"c2", from:"Module 3 sheet",
+      title:"Classical concerto", intro:"Clear, tidy and balanced. One tune at a time, with neat accompaniment.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"When and who", p:"About 1750 to 1820.", list:["Mozart","Haydn","Beethoven"]},
+          {h:"The big idea", p:"Balance. Tunes in matching phrases, like a question and an answer. Sections that come back so things feel even."},
+          {h:"The piece you studied", p:"Mozart, Piano Concerto No. 23 in A major.", eg:"Its slow middle movement is in F♯ minor, with a gentle rocking rhythm in 6/8. The finale is a rondo."},
+        ]},
+        {type:"rows", head:"Spot it", tick:"I can spot this", items:[
+          {t:"Piano, not harpsichord", e:"The piano can play loud and soft, so the harpsichord and continuo fade out.", eg:"The soloist is often a pianist."},
+          {t:"Crescendo and diminuendo", aka:"cresc. and dim. Diminuendo is also called decrescendo.", e:"The volume slides smoothly: gradually louder, or gradually softer.", eg:"The opposite of Baroque terraced dynamics."},
+          {t:"Homophonic texture", aka:"Close to “melody and accompaniment”.", e:"One tune matters most. Everything else is chords underneath.", eg:"You could hum the tune and nothing else would feel missing."},
+          {t:"Alberti bass", e:"A broken-chord pattern, usually in the piano’s left hand, under the tune.", eg:"For a C chord: C-G-E-G, over and over (low, high, middle, high)."},
+          {t:"Diatonic", e:"Only notes and chords that belong to the key.", eg:"In C major, white notes only."},
+        ]},
+        {type:"rows", head:"The three forms", tick:"I can explain this", items:[
+          {t:"Sonata form", aka:"“Subjects” just means the main tunes.", e:"Two contrasting tunes: played, explored, then played again. See the steps below.", eg:"Usually the first movement."},
+          {t:"Rondo", e:"The main tune (A) keeps coming back, whole and in the home key, with new music in between.", eg:"A B A C A, or longer: A B A C A D A.", m:"Just A B A is called ternary form. Usually the last movement."},
+          {t:"Minuet and trio", e:"A dance in 3 (count 1-2-3). Minuet, then a lighter trio, then the minuet again.", eg:"Minuet → Trio → Minuet.", m:"Most at home as the third movement of a four-movement symphony."},
+        ]},
+        {type:"flow", head:"Sonata form, step by step", steps:[
+          ["Exposition","Subject 1 and subject 2 are played. They contrast in mood and key.","In a concerto, the orchestra and the soloist can each have their own go."],
+          ["Development","The subjects are explored and travel through lots of keys.","It feels restless, like the music is on a journey."],
+          ["Recapitulation","Both subjects come back. Subject 2 now stays in the home key.","So the music can finish at home."],
+          ["Cadenza, then the end","In a concerto, the soloist plays alone near the end and shows off.","The orchestra waits, then joins in to finish."],
+        ]},
+        {type:"remember", text:"Classical = balance. Smooth swells, one clear tune with neat chords underneath, and forms where things come back."},
+      ]},
+
+    /* ---------------- 3. Romantic ---------------- */
+    romantic: { name:"Romantic", what:"c1820–c1900, Schumann", c:"c3", from:"Module 3 sheet + course",
+      title:"Romantic concerto", intro:"Everything gets bigger: the orchestra, the feelings, the volume and the solo part.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"When and who", p:"About 1820 to 1900.", list:["Schumann","Brahms","Tchaikovsky","Rachmaninov"]},
+          {h:"Sounds to listen for", words:["big orchestra","chromatic","huge dynamics","rubato"]},
+          {h:"The piece you studied", p:"Schumann, Piano Concerto in A minor.", eg:"Written for his wife Clara, a famous pianist, who played it first in 1845. The oboe plays the main theme first. The second movement runs straight into the third with no break."},
+        ]},
+        {type:"rows", head:"Spot it", tick:"I can spot this", items:[
+          {t:"Bigger orchestra", e:"More players, more brass and percussion. The sound is thicker and more powerful.", eg:"Compare the small Baroque string group."},
+          {t:"Chromatic harmony", aka:"Also called chromaticism.", e:"Uses notes and chords from outside the key. It sounds richer, sometimes clashing or yearning.", eg:"In C major, some black notes too, like F♯."},
+          {t:"Huge dynamic range", e:"From almost silent to enormous, with long dramatic swells as well as sudden changes.", eg:"Classical swells, but Romantic swells further."},
+          {t:"Rubato", aka:"Italian for “stolen time”.", e:"The player stretches and squeezes the tempo to add feeling.", eg:"A phrase slows down at its peak, then catches up."},
+          {t:"Very virtuosic soloist", e:"The hardest solo parts yet. The soloist is the star.", eg:"Fast runs and big chords across the whole keyboard."},
+          {t:"Freer structure", e:"Composers bend the old forms. Movements can join up, and one theme can return across the piece.", eg:"In Schumann, movement 2 flows straight into movement 3."},
+        ]},
+        {type:"remember", text:"Romantic doesn’t mean love songs. It means big feelings, told with a big orchestra, chromatic harmony and a star soloist."},
+      ]},
+
+    /* ---------------- hub: every concerto ---------------- */
+    concerto: { name:"Every concerto", what:"what all three share", c:"c5", from:"Module 2 sheet",
+      title:"What every concerto has", intro:"These never change. The three periods are just different ways of doing them.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"What a concerto is", p:"A long piece for a soloist (or a small group) and an orchestra."},
+          {h:"Shape", p:"Usually three movements: fast, slow, fast."},
+          {h:"The orchestra", list:["Strings: violin, viola, cello, double bass","Woodwind: flute, oboe, clarinet, bassoon","Brass: French horn, trumpet, trombone, tuba","Percussion: tuned and untuned"]},
+        ]},
+        {type:"rows", head:"Spot it", tick:"I can spot this", items:[
+          {t:"Movement", e:"A big section of the piece that could be played on its own.", eg:"Like a chapter that also works as a short story."},
+          {t:"Solo", e:"A section where the soloist plays alone.", eg:"The orchestra goes quiet."},
+          {t:"Dialogue", e:"Soloist and orchestra take turns, like a conversation.", eg:"The orchestra plays a phrase, the soloist answers."},
+          {t:"Virtuoso", aka:"Virtuosic = very hard to play.", e:"A highly skilled player. Concerto solo parts are written to show this off.", eg:"Very fast notes, big leaps, high and low extremes."},
+          {t:"Cadenza", e:"A show-off solo near the end of a movement, especially the first. The orchestra stops and waits.", eg:"In every period, from Bach to Schumann."},
+        ]},
+        {type:"remember", text:"A concerto is a soloist and an orchestra, taking turns. Everything else is how that changed over 300 years."},
+      ]},
+
+    /* ---------------- extras ---------------- */
+    spot: { name:"Spot the period", c:"tool", title:"Spot the period",
+      intro:"The listening exam’s favourite question. The same elements from the MAD T-shirt model, done three ways.",
+      blocks:[
+        {type:"table", head:"One element at a time", cols:["Listen to…","Baroque","Classical","Romantic"], rows:[
+          ["Dynamics","Terraced: loud or soft, switched suddenly","Crescendo and diminuendo: smooth swells","Huge range, dramatic swells"],
+          ["Texture","Polyphonic: equal tunes woven together","Homophonic: one tune, chords under it","Thick and rich"],
+          ["Harmony","Diatonic","Diatonic: clear, simple chords","More chromatic"],
+          ["Instruments","Harpsichord and cello continuo, mostly strings","Piano soloist, no harpsichord","Big orchestra, more brass and percussion"],
+          ["Soloist","Often a small group (concertino)","One soloist, often piano","One star soloist, very virtuosic"],
+          ["Melody","Decorated with trills and mordents","Balanced phrases, like question and answer","Long, singing, emotional tunes"],
+          ["Tempo","Steady beat","Steady beat","Rubato: the beat stretches"],
+          ["Structure","Ritornello: tune returns in pieces","Sonata form, rondo","Freer: movements may join up"],
+        ]},
+        {type:"table", head:"Quick clues", cols:["If you hear…","Think…"], rows:[
+          ["A harpsichord plinking underneath","Baroque"],
+          ["One tune entering part after part","Baroque (fugue)"],
+          ["Volume that jumps but never swells","Baroque"],
+          ["A neat broken-chord pattern under a clear tune","Classical (Alberti bass)"],
+          ["Smooth swells, but everything tidy and balanced","Classical"],
+          ["A huge orchestra, big emotions, the tempo stretching","Romantic"],
+        ]},
+        {type:"checks", head:"Before the listening exam, I can…", items:[
+          "Name the period and give two reasons from the table",
+          "Say whether there’s one soloist or a small group",
+          "Say whether the texture is polyphonic or homophonic",
+          "Say whether the dynamics are terraced or gradual",
+        ]},
+      ]},
+
+    tools: { name:"Composing tools", c:"tool", from:"Module 4 sheet", title:"Composing tools",
+      intro:"Software for your own composition work. The sheet has one term so far.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"MuseScore", p:"Write music as a score on the computer, then play it back."},
+          {h:"Soundtrap", p:"An online recording studio. Module 5: not on the sheets yet."},
+        ]},
+        {type:"rows", tick:"I know this", items:[
+          {t:"MIDI", aka:"Musical Instrument Digital Interface.", e:"A way for instruments and computers to share musical instructions (pitch, length, volume) without sending any actual sound.", eg:"MIDI says “play middle C, this loud, for one beat”. It’s like sheet music a computer can read."},
+        ]},
+        {type:"remember", text:"MIDI is the instructions, not the recording."},
+      ]},
+  },
+
+  jargon: {
+    intro: "The sheets use different words for the same thing, and split some pairs of opposites across two sheets.",
+    items: [
+      ["Decoration = ornament = ornamentation","Extra notes that dress up a tune. Trills and mordents are ornaments."],
+      ["Subject = theme = tune","In sonata form, a “subject” is just a main tune."],
+      ["Concertino = the solo group","In a concerto grosso."],
+      ["Ripieno = tutti = the orchestra","In a concerto grosso. Tutti means “everyone”."],
+      ["Basso continuo = continuo","Harpsichord and cello, filling in chords and bass."],
+      ["Polyphonic = contrapuntal","Several equal tunes at once. Opposite: homophonic."],
+      ["Homophonic ≈ melody and accompaniment","One tune, with chords under it."],
+      ["Terraced ↔ crescendo and diminuendo","Volume that jumps ↔ volume that slides."],
+      ["Diminuendo = decrescendo = dim.","Gradually getting softer."],
+      ["Diatonic ↔ chromatic","Notes inside the key ↔ notes from outside it."],
+      ["Ritornello ↔ rondo","Tune returns in pieces, in new keys ↔ tune returns whole, in the home key."],
+      ["Ternary = ABA","A rondo is ABA that keeps going: ABACA."],
+      ["Virtuoso = virtuosic","A brilliant player, or music that needs one."],
+      ["’cello = cello","Short for violoncello. Same instrument."],
+    ],
+  },
+};
+
+/* ======================= end of DATA ======================= */
+
+
+/* ---------- engine (shared; don't edit per subject) ---------- */
+(function(){
+  const S = DATA.sections, ids = Object.keys(S);
+  const col = id => `var(--${S[id].c === "tool" ? "c-tool" : S[id].c})`;
+  let ticks = {};
+  try { ticks = JSON.parse(localStorage.getItem(DATA.storageKey) || "{}") || {}; } catch(e) { ticks = {}; }
+  const save = () => { try { localStorage.setItem(DATA.storageKey, JSON.stringify(ticks)); } catch(e){} };
+
+  document.title = DATA.title;
+  document.getElementById("title").innerHTML = DATA.title;
+  document.getElementById("lede").innerHTML = DATA.lede;
+
+  /* nav */
+  const N = DATA.nav, nav = document.getElementById("nav");
+  nav.classList.add("shape-" + N.shape);
+  const nodeBtn = (id, num) => `<button class="node" type="button" style="--c:${col(id)}" data-id="${id}" aria-pressed="false">
+      ${num ? `<span class="num">${num}</span>` : ""}<span class="name">${S[id].name}</span>${S[id].what ? `<span class="what">${S[id].what}</span>` : ""}<span class="dots" aria-hidden="true"></span></button>`;
+  let h = "";
+  if (N.shape === "tree"){
+    const nodes = N.groups[0].nodes;
+    h = `<div class="root"><span>${N.root}</span></div><div class="trunk"></div>
+         <ul class="hang" style="--n:${nodes.length}">${nodes.map(id => `<li>${nodeBtn(id)}</li>`).join("")}</ul>`;
+  } else if (N.shape === "chain"){
+    const nodes = N.groups[0].nodes;
+    h = `${N.caption ? `<p class="cap">${N.caption}</p>` : ""}
+         <ol class="chainrow${N.hub ? " has-hub" : ""}" style="--n:${nodes.length}">${nodes.map((id,i) => `<li>${nodeBtn(id, i+1)}</li>`).join("")}</ol>
+         ${N.hub ? `<div class="trunk"></div><div class="hub">${nodeBtn(N.hub)}</div>` : ""}`;
+  } else {
+    h = `<div class="root"><span>${N.root}</span></div><div class="trunk"></div>
+         <div class="groups" style="--g:${N.groups.length}">${N.groups.map(g => `
+           <div class="group"><div class="glabel"><b>${g.label}</b>${g.sub ? `<span>${g.sub}</span>` : ""}</div><div class="trunk"></div>
+           <ul class="hang" style="--n:${g.nodes.length}">${g.nodes.map(id => `<li>${nodeBtn(id)}</li>`).join("")}</ul></div>`).join("")}</div>`;
+  }
+  h += `<div class="extras">${(N.extras||[]).map(id => `<button class="pill" type="button" style="--c:${col(id)}" data-id="${id}" aria-pressed="false">${S[id].name}</button>`).join("")}</div>`;
+  nav.innerHTML = h;
+
+  /* blocks */
+  const head = b => b.head ? `<h3 class="sub">${b.head}</h3>` : "";
+  const R = {
+    facts: b => `${head(b)}<div class="facts" style="--n:${Math.min(b.cards.length,3)}">${b.cards.map(c => `<div class="fact"><h3>${c.h}</h3>
+        ${c.p ? `<p>${c.p}</p>` : ""}${c.list ? `<ul>${c.list.map(x => `<li>${x}</li>`).join("")}</ul>` : ""}
+        ${c.words ? `<ul class="words">${c.words.map(w => `<li>${w}</li>`).join("")}</ul>` : ""}
+        ${c.badge ? `<p><span class="badge ${c.badge[0]}">${c.badge[1]}</span></p>` : ""}${c.eg ? `<span class="eg">${c.eg}</span>` : ""}</div>`).join("")}</div>`,
+    rows: (b, id, bi) => `${head(b)}<ul class="rows">${b.items.map((r,i) => { const k = `${id}:${bi}:${i}`; return `<li class="row${ticks[k] ? " done" : ""}">
+        <div>${r.lead && r.q ? `<p class="q lead">“${r.q}”</p>${r.aka ? `<span class="aka">${r.aka}</span>` : ""}`
+                             : `<h4>${r.t}</h4>${r.aka ? `<span class="aka">${r.aka}</span>` : ""}${r.q ? `<p class="q">“${r.q}”</p>` : ""}`}</div>
+        <div class="explain${b.style === "maths" ? " maths" : ""}">${b.style === "maths" ? r.e : `<p>${r.e}</p>`}${r.eg ? `<span class="eg">${r.eg}</span>` : ""}${r.m ? `<span class="method">${r.m}</span>` : ""}</div>
+        <label class="tick"><input type="checkbox" data-k="${k}"${ticks[k] ? " checked" : ""}> ${b.tick || "Got it"}</label></li>`; }).join("")}</ul>`,
+    flow: b => `${head(b)}<ol class="flow">${b.steps.map(([t,j,l]) => `<li><div><b>${t}</b>${j ? `<span class="job">${j}</span>` : ""}</div>${l ? `<div class="line">${l}</div>` : "<div></div>"}</li>`).join("")}</ol>`,
+    table: b => `${head(b)}<div class="tbl-wrap"><table class="tbl"><thead><tr>${b.cols.map(c => `<th>${c}</th>`).join("")}</tr></thead>
+        <tbody>${b.rows.map(r => `<tr>${r.map((c,ci) => ci === b.cols.length ? "" : `<td>${c}${ci === 0 && b.srcCol != null && r[b.srcCol] ? `<span class="src">${r[b.srcCol]}</span>` : ""}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`,
+    checks: (b, id, bi) => `${head(b)}<ul class="checks">${b.items.map((c,i) => { const k = `chk:${id}:${bi}:${i}`; return `<li><label><input type="checkbox" data-k="${k}"${ticks[k] ? " checked" : ""}> ${c}</label></li>`; }).join("")}</ul>`,
+    remember: b => `<p class="remember"><strong>${b.label || "Remember"}:</strong> ${b.text}</p>`,
+    html: b => b.html,
+  };
+
+  const panels = document.getElementById("panels");
+  ids.forEach(id => {
+    const sec = S[id], el = document.createElement("section");
+    el.className = "panel"; el.id = "panel-" + id; el.hidden = true; el.style.setProperty("--c", col(id));
+    el.innerHTML = `<div class="panel-head"><h2>${sec.title || sec.name}</h2>${sec.from ? `<span class="from">${sec.from}</span>` : ""}${sec.intro ? `<p>${sec.intro}</p>` : ""}</div>`
+      + (sec.blocks || []).map((b, bi) => R[b.type](b, id, bi)).join("");
+    panels.appendChild(el);
+  });
+
+  /* jargon */
+  const J = DATA.jargon;
+  if (J && J.items && J.items.length){
+    document.getElementById("jargon").innerHTML = `<h2 id="jh">Same thing, different names</h2><p>${J.intro}</p>
+      <dl>${J.items.map(([t,d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join("")}</dl>`;
+  } else document.getElementById("jargon").remove();
+
+  /* dots + routing */
+  const rowKeys = id => (S[id].blocks||[]).flatMap((b,bi) => b.type === "rows" ? b.items.map((_,i) => `${id}:${bi}:${i}`) : []);
+  function drawDots(){
+    nav.querySelectorAll(".node").forEach(btn => {
+      const id = btn.dataset.id, keys = rowKeys(id), done = keys.filter(k => ticks[k]).length;
+      btn.querySelector(".dots").innerHTML = keys.map((_,i) => `<i class="${i < done ? "on" : ""}"></i>`).join("");
+      btn.setAttribute("aria-label", `${S[id].name}: ${done} of ${keys.length} ticked`);
+    });
+  }
+  const first = (N.groups[0] && N.groups[0].nodes[0]) || ids[0];
+  const showAllBtn = document.getElementById("showAll");
+  let showingAll = false;
+  function show(id){
+    showingAll = false; showAllBtn.textContent = "Show everything";
+    if (!ids.includes(id)) id = first;
+    ids.forEach(k => {
+      document.getElementById("panel-" + k).hidden = k !== id;
+      const b = nav.querySelector(`[data-id="${k}"]`); if (b) b.setAttribute("aria-pressed", k === id ? "true" : "false");
+    });
+  }
+  nav.addEventListener("click", e => {
+    const b = e.target.closest("[data-id]"); if (!b) return;
+    if (location.hash === "#" + b.dataset.id) show(b.dataset.id); else location.hash = b.dataset.id;
+  });
+  window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+  panels.addEventListener("change", e => {
+    const k = e.target.dataset.k; if (!k) return;
+    if (e.target.checked) ticks[k] = true; else delete ticks[k];
+    const row = e.target.closest(".row"); if (row) row.classList.toggle("done", e.target.checked);
+    save(); drawDots();
+  });
+  showAllBtn.addEventListener("click", () => {
+    showingAll = !showingAll;
+    if (showingAll){
+      ids.forEach(k => { const p = document.getElementById("panel-" + k); p.hidden = false; p.style.marginBottom = "2.5rem";
+        const b = nav.querySelector(`[data-id="${k}"]`); if (b) b.setAttribute("aria-pressed","false"); });
+      showAllBtn.textContent = "Show one at a time";
+    } else show(location.hash.slice(1));
+  });
+  document.getElementById("reset").addEventListener("click", () => {
+    ticks = {}; save();
+    document.querySelectorAll("input[data-k]").forEach(i => i.checked = false);
+    document.querySelectorAll(".row.done").forEach(r => r.classList.remove("done"));
+    drawDots();
+  });
+  drawDots();
+  show(location.hash.slice(1));
+})();
+</script>
+</body>
+</html>
