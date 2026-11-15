@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>An Inspector Calls: the chain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F0; --surface:#FFFFFF; --ink:#1F2A2E; --muted:#56676C; --line:#C6D2CF; --soft:#E2E9E7;
+  --c-birling:#3E6FA8; --c-sheila:#2C7F69; --c-gerald:#7454AD; --c-mrs:#AE4459; --c-eric:#A96A1E;
+  --c-eva:#7A6A36; --c-inspector:#36525E; --c-tool:#36525E;
+  --sans:"Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+    --c-birling:#7FA8DA; --c-sheila:#6CC2A8; --c-gerald:#B39AE3; --c-mrs:#E38699; --c-eric:#E2A85E;
+    --c-eva:#CDBB86; --c-inspector:#A9C3CC; --c-tool:#A9C3CC;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+  --c-birling:#7FA8DA; --c-sheila:#6CC2A8; --c-gerald:#B39AE3; --c-mrs:#E38699; --c-eric:#E2A85E;
+  --c-eva:#CDBB86; --c-inspector:#A9C3CC; --c-tool:#A9C3CC;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:1.0625rem;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:62rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0 0 .4rem;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 2rem;max-width:42rem}
+
+/* ---- the chain ---- */
+.chain{margin:0 0 1.25rem}
+.chain-cap{font-size:.9rem;color:var(--muted);margin:0 0 .6rem;text-align:center}
+.links{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem;position:relative;counter-reset:link}
+.links::after{content:"";position:absolute;bottom:0;left:10%;right:10%;height:2px;background:var(--line)}
+.links li{position:relative;padding-bottom:1.4rem;display:flex}
+.links li::after{content:"";position:absolute;bottom:0;left:50%;width:2px;height:1.4rem;background:var(--line)}
+.trunk{width:2px;height:1.4rem;background:var(--line);margin:0 auto}
+.eva-row{display:flex;justify-content:center}
+.eva-row .node{flex:0 1 20rem}
+
+.node{all:unset;box-sizing:border-box;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.3rem;
+  background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:.75rem .5rem .7rem;transition:border-color .15s, background .15s;position:relative}
+.node:hover{border-color:var(--c)}
+.node:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.node[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+.node .num{font-size:.8rem;font-weight:700;color:var(--surface);background:var(--c);border-radius:999px;width:1.5rem;height:1.5rem;display:grid;place-items:center}
+.node .name{font-weight:700;color:var(--c);font-size:1.05rem;line-height:1.2}
+.node .what{font-size:.85rem;color:var(--muted);line-height:1.3}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:.15rem}
+.dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--c);display:block}
+.dots i.on{background:var(--c)}
+
+.extras{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin:1.5rem 0 2.25rem}
+.pill{all:unset;cursor:pointer;box-sizing:border-box;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:.45rem 1rem;font-weight:700;color:var(--c);font-size:.95rem}
+.pill:hover{border-color:var(--c)}
+.pill:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.pill[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+
+@media (max-width:720px){
+  .chain-cap{text-align:left}
+  .links{grid-template-columns:1fr;gap:.6rem;padding-left:1.5rem}
+  .links::after{top:0;bottom:0;left:1.5rem;right:auto;width:2px;height:auto}
+  .links li{padding:0 0 0 1.25rem}
+  .links li::after{bottom:auto;top:50%;left:0;width:1.25rem;height:2px}
+  .trunk{margin:0 0 0 1.5rem;height:.9rem}
+  .eva-row{justify-content:flex-start}
+  .eva-row .node{flex:1}
+  .node{flex-direction:row;flex-wrap:wrap;text-align:left;align-items:center;padding:.6rem .85rem;gap:.15rem .65rem}
+  .node .what{flex:1 1 9rem}
+  .dots{justify-content:flex-start;flex-basis:100%;margin:0}
+  .extras{justify-content:flex-start}
+}
+
+/* ---- panels ---- */
+.panel-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem 1rem;margin:0 0 1rem;border-left:5px solid var(--c);padding-left:.85rem}
+.panel-head h2{margin:0;font-size:1.5rem;color:var(--c)}
+.panel-head .from{font-size:.85rem;color:var(--muted)}
+.panel-head p{margin:0;color:var(--muted);flex-basis:100%}
+
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin:0 0 1rem}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem}
+.fact h3{margin:0 0 .25rem;font-size:.85rem;color:var(--muted);font-weight:400}
+.fact p{margin:0}
+.badge{display:inline-block;font-weight:700;border-radius:999px;padding:.1rem .65rem;font-size:.95rem;border:2px solid currentColor}
+.badge.yes{color:var(--c-sheila)} .badge.no{color:var(--c-mrs)} .badge.part{color:var(--c-eric)}
+@media (max-width:720px){.facts{grid-template-columns:1fr}}
+
+.sub{font-size:1.1rem;margin:1.5rem 0 .6rem}
+.rows{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto;gap:.4rem 1.5rem;padding:1rem 1.15rem;border-top:1px solid var(--line);align-items:start}
+.row:first-child{border-top:0}
+.q{margin:0;font-size:1.08rem;font-style:italic;border-left:3px solid var(--c);padding-left:.7rem}
+.row h4{margin:0;font-size:1.05rem}
+.meta{display:block;margin-top:.3rem;font-size:.85rem;color:var(--muted);padding-left:.85rem}
+.row h4 + .meta{padding-left:0}
+.explain{background:var(--soft);border-radius:8px;padding:.6rem .8rem}
+.explain p{margin:0}
+.explain .method{display:block;margin-top:.35rem;font-size:.88rem;color:var(--muted)}
+.tick{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--muted);cursor:pointer;white-space:nowrap;padding-top:.15rem}
+.tick input{width:1.25rem;height:1.25rem;accent-color:var(--c);cursor:pointer;margin:0}
+.row.done .q::after,.row.done h4::after{content:" ✓";font-style:normal;color:var(--c)}
+@media (max-width:720px){
+  .row{grid-template-columns:1fr auto}
+  .row .explain{grid-column:1 / -1;grid-row:2}
+  .row .tick{grid-column:2;grid-row:1}
+}
+.remember{margin:1rem 0 0;padding:.85rem 1rem;border:2px dashed var(--c);border-radius:12px}
+.remember strong{color:var(--c)}
+
+/* context table */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:0 0 1rem}
+.two .fact ul{margin:.2rem 0 0;padding-left:1.1rem}
+@media (max-width:620px){.two{grid-template-columns:1fr}}
+
+/* themes */
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 1rem}
+.chip{all:unset;cursor:pointer;border:2px solid var(--line);border-radius:999px;padding:.35rem .9rem;font-size:.95rem;background:var(--surface)}
+.chip:hover{border-color:var(--ink)}
+.chip:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.who-tag{font-weight:700;color:var(--c)}
+
+/* essay */
+.steps{list-style:none;margin:0 0 1rem;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;counter-reset:st}
+.steps li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem;counter-increment:st}
+.steps h3{margin:0 0 .2rem;font-size:1.05rem}
+.steps h3::before{content:counter(st) ". "}
+.steps .time{font-size:.85rem;color:var(--muted);display:block;margin-bottom:.3rem}
+.steps ul{margin:0;padding-left:1.1rem}
+@media (max-width:720px){.steps{grid-template-columns:1fr}}
+.recipe{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem 1.15rem}
+.recipe .qline{color:var(--muted);margin:0 0 .75rem}
+.part{display:grid;grid-template-columns:7.5rem minmax(0,1fr);gap:.25rem 1rem;padding:.55rem 0;border-top:1px solid var(--line)}
+.part:first-of-type{border-top:0}
+.part b{color:var(--pc)}
+.part .ask{display:block;font-size:.85rem;color:var(--muted);font-weight:400}
+.part p{margin:0;border-left:4px solid var(--pc);padding-left:.7rem}
+@media (max-width:560px){.part{grid-template-columns:1fr}}
+.traps{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:.75rem}
+.traps div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.75rem .95rem}
+.traps dt{font-weight:700}
+.traps dd{margin:.15rem 0 0;color:var(--muted);font-size:.95rem}
+.checks{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.checks li{border-top:1px solid var(--line);padding:.65rem 1rem}
+.checks li:first-child{border-top:0}
+.checks label{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer}
+.checks input{width:1.2rem;height:1.2rem;margin:.2rem 0 0;accent-color:var(--ink);flex:none}
+
+/* jargon */
+.jargon{margin-top:3rem}
+.jargon h2{font-size:1.3rem;margin:0 0 .3rem}
+.jargon>p{color:var(--muted);margin:0 0 1rem}
+.jargon dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.75rem}
+.jargon div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.75rem .95rem}
+.jargon dt{font-weight:700}
+.jargon dd{margin:.15rem 0 0;color:var(--muted);font-size:.95rem}
+
+.tools{display:flex;gap:.75rem;flex-wrap:wrap;margin:1.25rem 0 0}
+.btn{all:unset;cursor:pointer;font-size:.9rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem}
+.btn:hover{color:var(--ink);border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .chain,.extras,.tools,.tick,.chips{display:none!important}
+  .panel{display:block!important;margin-bottom:1.5rem}
+  .theme-set{display:block!important;margin-bottom:1rem}
+  .row,.part{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>An Inspector Calls, as a chain</h1>
+  <p class="lede">The whole play is one chain. Each person did one thing to Eva Smith, and the Inspector questions them in this order. Pick a link to see what they did, how they react, and the quotes worth knowing.</p>
+
+  <nav aria-label="Characters and tools">
+    <div class="chain">
+      <p class="chain-cap">The order the Inspector questions them</p>
+      <ol class="links" id="links"></ol>
+      <div class="trunk"></div>
+      <div class="eva-row" id="evaRow"></div>
+    </div>
+    <div class="extras" id="extras"></div>
+  </nav>
+
+  <div id="panels"></div>
+
+  <div class="tools">
+    <button class="btn" id="showAll" type="button">Show everything</button>
+    <button class="btn" id="reset" type="button">Clear my ticks</button>
+  </div>
+
+  <section class="jargon" aria-labelledby="jh">
+    <h2 id="jh">Same thing, different names</h2>
+    <p>The sheets switch between words that mean the same thing.</p>
+    <dl>
+      <div><dt>WHAT → HOW → WHY</dt><dd>The same as Claim → Evidence → Explore → Connect. Module 5 just splits it into four.</dd></div>
+      <div><dt>Eva Smith = Daisy Renton</dt><dd>Same person. She uses the name Daisy Renton when she meets Gerald.</dd></div>
+      <div><dt>Goole = the Inspector</dt><dd>Inspector Goole is his full name.</dd></div>
+      <div><dt>Method = writer’s choice = stagecraft</dt><dd>Anything Priestley deliberately decided: words, stage directions, lighting, who interrupts, when someone walks in.</dd></div>
+      <div><dt>Capitalism ≈ individualism</dt><dd>On these sheets both mean “look after yourself, profit comes first”. Birling’s view.</dd></div>
+      <div><dt>Socialism ≈ social responsibility</dt><dd>“We’re responsible for each other.” Priestley’s and the Inspector’s view.</dd></div>
+      <div><dt>Thesis</dt><dd>Your answer to the question, in one sentence.</dd></div>
+      <div><dt>Context</dt><dd>What was going on in 1912 (when it’s set) and 1945 (when people first watched it).</dd></div>
+    </dl>
+  </section>
+</main>
+
+<script>
+const PEOPLE = [
+ { id:"birling", name:"Mr Birling", what:"Sacked her", act:"Act 1", c:"birling",
+   did:"Sacked Eva from his factory for helping lead a strike for higher wages.",
+   accepts:["no","Refuses"],
+   shows:"Selfish capitalism, and an older man who won’t learn.",
+   rows:[
+    {q:"hard-headed businessman", act:"Act 1", e:"He’s proud that profit comes before feelings.", m:"Self-description: he tells us who he is before the Inspector tests it."},
+    {q:"unsinkable, absolutely unsinkable", act:"Act 1", e:"He’s talking about the Titanic. The 1945 audience knows it sank, so he looks foolish.", m:"Dramatic irony: if he’s wrong about this, why trust his other opinions?"},
+    {q:"a man has to mind his own business and look after himself", act:"Act 1", e:"Selfishness stated as a rule. The opposite of the play’s message.", m:"Structure: the Inspector rings the doorbell straight after this speech."},
+    {q:"prosperous manufacturer", act:"Opening stage directions", e:"Wealth and status, set up before anyone challenges him.", m:"Stage direction: the audience judges him from the very first moment."},
+   ],
+   remember:"His real failure isn’t just sacking Eva. It’s that he refuses to learn from it." },
+ { id:"sheila", name:"Sheila", what:"Got her fired", act:"Act 1", c:"sheila",
+   did:"Got Eva sacked from Milwards shop because she was jealous.",
+   accepts:["yes","Accepts"],
+   shows:"Young people can change. Hope for a fairer future.",
+   rows:[
+    {q:"These girls aren’t cheap labour – they’re people.", act:"Act 1", e:"She sees Eva as a person, not a worker. Empathy.", m:"Contrast: said to her father, who sees workers as costs."},
+    {q:"It was my own fault.", act:"Act 1", e:"Short and direct. No excuses, unlike her parents.", m:"Language: simple words make her honesty sound real."},
+    {q:"I’ll never, never do it again.", act:"Act 1", e:"Real remorse. She wants to change.", m:"Repetition: “never, never” shows how strongly she means it."},
+    {q:"You were the wonderful Fairy Prince.", act:"Act 2", e:"Sarcastic, to Gerald. She’s growing more confident and independent.", m:"Tone: mocking the fairy-tale romance he tried to tell."},
+   ],
+   remember:"Sheila isn’t perfect: she did real harm. What matters is she listens and changes." },
+ { id:"gerald", name:"Gerald", what:"Affair, then left", act:"Act 2", c:"gerald",
+   did:"Kept Eva (as “Daisy Renton”) in rooms as his mistress, then ended it.",
+   accepts:["part","Partly"],
+   shows:"Power is complicated. You can be kind and still in control.",
+   rows:[
+    {q:"I insisted on Daisy moving into those rooms", act:"Act 2", e:"He helped her, but he made the decision, not her.", m:"Verb: “insisted” shows who holds the power."},
+    {q:"I suppose it was inevitable.", act:"Act 2", e:"Makes the affair sound like nobody’s choice. Dodges blame.", m:"Language: “inevitable” is self-justifying."},
+    {q:"I didn’t feel about her as she felt about me.", act:"Act 2", e:"An honest moment, but it shows how unequal they were.", m:"Contrast: Eva depended on him far more than he did on her."},
+   ],
+   remember:"Don’t label him just good or just bad. He genuinely helps Eva and also exploits her." },
+ { id:"mrs", name:"Mrs Birling", what:"Refused her help", act:"Act 2", c:"mrs",
+   did:"Ran a women’s charity and turned Eva away when she was pregnant and desperate.",
+   accepts:["no","Refuses"],
+   shows:"Class prejudice, and how much power charities held before the welfare state.",
+   rows:[
+    {q:"rather cold woman", act:"Opening stage directions", e:"Distant from the very start.", m:"Stage direction: shapes our view of her before she speaks."},
+    {q:"I admit I was prejudiced against her case.", act:"Act 2", e:"She admits it but isn’t sorry. Being certain matters more to her than being fair.", m:"Language: “admit” sounds honest, yet she doesn’t change."},
+    {t:"She blames the baby’s father", act:"End of Act 2", e:"She demands he be punished. The audience starts to realise it’s her son, Eric.", m:"Dramatic irony and delayed revelation: Priestley holds back Eric’s part to build tension."},
+   ],
+   remember:"She’s limited by being a woman in 1912, yet still uses her class to harm another woman." },
+ { id:"eric", name:"Eric", what:"Got her pregnant", act:"Mostly Act 3", c:"eric",
+   did:"Got Eva pregnant and stole money from his father’s business to give her.",
+   accepts:["yes","Accepts"],
+   shows:"Like Sheila, the younger generation can take responsibility.",
+   rows:[
+    {q:"half shy, half assertive", act:"Opening stage directions", e:"Uneasy and mixed-up from the start. Hints he’s hiding something.", m:"Stage direction: two halves suggest a split character."},
+    {t:"Act 3 isn’t on the key sheets yet", act:"Coming later", e:"Add Eric’s quotes once you’ve covered Act 3 in class.", m:"Look for: how he reacts to his parents, compared with Sheila."},
+   ],
+   remember:"Watch how Priestley pairs Eric with Sheila against their parents." },
+];
+
+const EXTRAS = [
+ { id:"eva", name:"Eva Smith", what:"The person at the centre", c:"eva", kind:"eva",
+   intro:"We never see her on stage. Every link in the chain pushes her further down.",
+   rows:[
+    {t:"Why she was so vulnerable", act:"Modules 3 and 4", e:"Not just because she was a woman, but because she was a working-class woman in 1912.", m:"Gender + class together left her with almost no power."},
+    {t:"Strong, but powerless", act:"Act 2", e:"She’s resilient and dignified, yet still can’t protect herself.", m:"Avoid calling her just a victim."},
+    {t:"She stands for many people", act:"Module 1", e:"Characters are constructs. Eva represents every worker treated as cheap labour.", m:"Her very ordinary name helps: Smith could be anyone."},
+   ]},
+ { id:"inspector", name:"The Inspector", what:"Priestley’s voice", c:"inspector", kind:"rows",
+   intro:"He has no money or status, but he takes control through moral authority.",
+   rows:[
+    {q:"massiveness, solidity and purposefulness", act:"Stage direction, Act 1", e:"He feels powerful the moment he walks in.", m:"Stage direction: physical presence = authority."},
+    {q:"carefully, weightily", act:"Stage direction, Act 1", e:"He speaks slowly and seriously, and can cut through Birling’s speeches.", m:"Dialogue and interruption shift control of the scene."},
+    {q:"one person and one line of inquiry at a time", act:"Act 1", e:"He decides the order. That order is the chain.", m:"Structure: each character is exposed in turn."},
+    {q:"pink and intimate → brighter and harder", act:"Lighting, Act 1", e:"Cosy becomes exposed. Truth is coming out.", m:"Lighting is a method too: use it."},
+    {q:"Public men, Mr Birling, have responsibilities as well as privileges.", act:"Act 2", e:"The play’s message in one line.", m:"Contrast: answers Birling’s “look after himself”."},
+   ],
+   remember:"Birling has social and economic power. The Inspector has moral power. Priestley sets them against each other." },
+ { id:"context", name:"Big picture", what:"1912 vs 1945", c:"tool", kind:"context" },
+ { id:"themes", name:"Themes", what:"Ideas across the play", c:"tool", kind:"themes" },
+ { id:"essay", name:"Writing the essay", what:"Module 5", c:"tool", kind:"essay" },
+];
+
+const THEMES = {
+  "Responsibility":[
+    ["birling","Refuses it.","a man has to mind his own business"],
+    ["sheila","Accepts it straight away.","It was my own fault."],
+    ["gerald","Edges away from it.","I suppose it was inevitable."],
+    ["mrs","Refuses it, and blames someone else.","I admit I was prejudiced against her case."],
+    ["inspector","Says privilege comes with duty.","responsibilities as well as privileges"],
+  ],
+  "Class and power":[
+    ["birling","Economic power: he can sack strikers.","hard-headed businessman"],
+    ["sheila","Uses her status as a rich customer.",null],
+    ["gerald","Controls where Eva lives.","I insisted on Daisy moving into those rooms"],
+    ["mrs","Controls who gets charity.","prejudiced against her case"],
+    ["eva","Has almost no power at all.",null],
+  ],
+  "Gender":[
+    ["eva","Vulnerable as a working-class woman.",null],
+    ["gerald","A man with money deciding a woman’s life.","I insisted"],
+    ["mrs","Limited as a woman, yet powerful through class.",null],
+    ["sheila","Grows more independent and challenges men.","You were the wonderful Fairy Prince."],
+  ],
+  "Old vs young":[
+    ["birling","Won’t change.","unsinkable, absolutely unsinkable"],
+    ["mrs","Gets more defensive and certain.",null],
+    ["sheila","Learns and changes.","I’ll never, never do it again."],
+    ["eric","Sides with Sheila (Act 3).",null],
+    ["inspector","Not simply young = good, old = bad. It’s about who learns.",null],
+  ],
+  "Capitalism vs socialism":[
+    ["birling","Capitalism: profit and self-interest.","look after himself"],
+    ["sheila","Starts to see workers as people.","they’re people"],
+    ["inspector","Socialism: shared responsibility.","responsibilities as well as privileges"],
+    ["eva","Treated as cheap labour.",null],
+  ],
+};
+
+const ESSAY_CHECKS = [
+  "I answer the exact question all the way through.",
+  "Each paragraph makes a different point.",
+  "My quotes come from across the play, not one scene.",
+  "I explain why Priestley does things, not just what happens.",
+  "I mention the audience and that it’s a play.",
+  "Context helps explain my point, not tacked on.",
+  "My conclusion matches my argument.",
+];
+
+/* ---------- helpers ---------- */
+const KEY = "aic-tree-ticks";
+let ticks = {};
+try { ticks = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { ticks = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(ticks)); } catch(e){} };
+const byId = Object.fromEntries([...PEOPLE, ...EXTRAS].map(p => [p.id, p]));
+const color = id => `var(--c-${byId[id].c})`;
+
+function rowsHTML(owner, rows){
+  return `<ul class="rows">${rows.map((r,i) => {
+    const k = owner + ":" + i;
+    const head = r.q ? `<blockquote class="q">“${r.q}”</blockquote><span class="meta">${r.act}</span>`
+                     : `<h4>${r.t}</h4><span class="meta">${r.act}</span>`;
+    const tickLabel = r.q ? "I know this" : "Got it";
+    return `<li class="row${ticks[k] ? " done" : ""}">
+      <div>${head}</div>
+      <div class="explain"><p>${r.e}</p><span class="method">${r.m}</span></div>
+      <label class="tick"><input type="checkbox" data-k="${k}"${ticks[k] ? " checked" : ""}> ${tickLabel}</label>
+    </li>`; }).join("")}</ul>`;
+}
+
+/* ---------- build nav ---------- */
+const linksEl = document.getElementById("links");
+PEOPLE.forEach((p,i) => {
+  const li = document.createElement("li");
+  li.innerHTML = `<button class="node" type="button" style="--c:${color(p.id)}" data-id="${p.id}" aria-pressed="false">
+    <span class="num">${i+1}</span><span class="name">${p.name}</span><span class="what">${p.what}</span><span class="dots" aria-hidden="true"></span></button>`;
+  linksEl.appendChild(li);
+});
+document.getElementById("evaRow").innerHTML =
+  `<button class="node" type="button" style="--c:${color("eva")}" data-id="eva" aria-pressed="false">
+    <span class="name">Eva Smith</span><span class="what">The person at the centre</span><span class="dots" aria-hidden="true"></span></button>`;
+document.getElementById("extras").innerHTML = EXTRAS.filter(x => x.id !== "eva").map(x =>
+  `<button class="pill" type="button" style="--c:${color(x.id)}" data-id="${x.id}" aria-pressed="false">${x.name}</button>`).join("");
+
+/* ---------- build panels ---------- */
+const panelsEl = document.getElementById("panels");
+function addPanel(id, html){
+  const sec = document.createElement("section");
+  sec.className = "panel"; sec.id = "panel-" + id; sec.hidden = true;
+  sec.style.setProperty("--c", color(id));
+  sec.innerHTML = html; panelsEl.appendChild(sec);
+}
+
+PEOPLE.forEach(p => addPanel(p.id, `
+  <div class="panel-head"><h2>${p.name}</h2><span class="from">${p.act}</span></div>
+  <div class="facts">
+    <div class="fact"><h3>What they did to Eva</h3><p>${p.did}</p></div>
+    <div class="fact"><h3>Do they accept the blame?</h3><p><span class="badge ${p.accepts[0]}">${p.accepts[1]}</span></p></div>
+    <div class="fact"><h3>Priestley uses them to show</h3><p>${p.shows}</p></div>
+  </div>
+  <h3 class="sub">Quotes worth knowing</h3>
+  ${rowsHTML(p.id, p.rows)}
+  <p class="remember"><strong>Remember:</strong> ${p.remember}</p>`));
+
+EXTRAS.forEach(x => {
+  if (x.kind === "eva" || x.kind === "rows") addPanel(x.id, `
+    <div class="panel-head"><h2>${x.name}</h2><p>${x.intro}</p></div>
+    ${rowsHTML(x.id, x.rows)}
+    ${x.remember ? `<p class="remember"><strong>Remember:</strong> ${x.remember}</p>` : ""}`);
+
+  if (x.kind === "context") addPanel(x.id, `
+    <div class="panel-head"><h2>Big picture</h2><p>Why the play exists, in a few facts.</p></div>
+    <div class="facts">
+      <div class="fact"><h3>The play in one line</h3><p>A rich family’s party is interrupted by an Inspector investigating a young woman’s death.</p></div>
+      <div class="fact"><h3>The big question</h3><p>How responsible are we for other people?</p></div>
+      <div class="fact"><h3>Priestley</h3><p>Fought in the First World War, saw poverty, and believed society should be fairer.</p></div>
+    </div>
+    <div class="two">
+      <div class="fact"><h3>1912: when it’s set</h3><ul><li>Just before the First World War</li><li>Huge gap between rich and poor</li><li>Women had fewer rights</li><li>No welfare state or NHS: desperate people relied on charity</li></ul></div>
+      <div class="fact"><h3>1945: when audiences first saw it</h3><ul><li>Two world wars had happened</li><li>A Labour government had just been elected</li><li>The welfare state was starting</li><li>People wanted a fairer society</li></ul></div>
+    </div>
+    <p class="remember"><strong>The key link:</strong> a 1945 audience looks back at 1912 and sees what went wrong. Use context only when it explains <em>why</em> Priestley made a choice.</p>`);
+
+  if (x.kind === "themes") {
+    const names = Object.keys(THEMES);
+    addPanel(x.id, `
+      <div class="panel-head"><h2>Themes</h2><p>Pick a theme to see which characters it’s about. Handy for planning an essay across the whole play.</p></div>
+      <div class="chips" role="group" aria-label="Themes">${names.map((t,i) =>
+        `<button class="chip" type="button" data-theme="${i}" aria-pressed="${i===0}">${t}</button>`).join("")}</div>
+      ${names.map((t,i) => `<div class="theme-set" data-set="${i}"${i ? " hidden" : ""}>
+        <h3 class="sub" style="margin-top:0">${t}</h3>
+        <ul class="rows">${THEMES[t].map(([who, pt, q]) => `<li class="row" style="--c:${color(who)};grid-template-columns:10rem minmax(0,1fr)">
+          <div><span class="who-tag">${byId[who].name}</span></div>
+          <div><p style="margin:0">${pt}</p>${q ? `<span class="meta" style="padding-left:0;font-style:italic">“${q}”</span>` : ""}</div>
+        </li>`).join("")}</ul></div>`).join("")}`);
+  }
+
+  if (x.kind === "essay") addPanel(x.id, `
+    <div class="panel-head"><h2>Writing the essay</h2><p>A strong essay is one clear answer to one question, not everything you know.</p></div>
+    <ol class="steps">
+      <li><h3>Plan</h3><span class="time">0–5 minutes</span><ul><li>Work out exactly what the question asks</li><li>Write your answer in one sentence</li><li>Pick 3–4 different points</li></ul></li>
+      <li><h3>Write</h3><span class="time">5–40 minutes</span><ul><li>Keep answering the question</li><li>Short, exact quotes</li><li>Talk about Priestley’s choices</li></ul></li>
+      <li><h3>Check</h3><span class="time">40–45 minutes</span><ul><li>Is the argument clear?</li><li>Quotes from across the play?</li><li>Mentioned the audience?</li></ul></li>
+    </ol>
+    <h3 class="sub">One paragraph, four parts</h3>
+    <div class="recipe">
+      <p class="qline">Example question: How does Priestley present Mr Birling?</p>
+      <div class="part" style="--pc:var(--c-birling)"><b>Claim<span class="ask">What am I arguing?</span></b>
+        <p>Priestley presents Birling as a man who only cares about himself.</p></div>
+      <div class="part" style="--pc:var(--c-sheila)"><b>Evidence<span class="ask">Which moment proves it?</span></b>
+        <p>He tells Gerald and Eric that “a man has to mind his own business and look after himself”.</p></div>
+      <div class="part" style="--pc:var(--c-gerald)"><b>Explore<span class="ask">What did Priestley choose, and why?</span></b>
+        <p>The phrase “has to” makes selfishness sound like a rule rather than a choice, and the sentence ends on “himself”, as if nobody else matters.</p></div>
+      <div class="part" style="--pc:var(--c-eric)"><b>Connect<span class="ask">Why does it matter?</span></b>
+        <p>The Inspector arrives straight after this speech, so the audience sees Birling’s view being challenged at once. A 1945 audience, after two wars, would see where that attitude leads.</p></div>
+    </div>
+    <h3 class="sub">Four traps</h3>
+    <dl class="traps">
+      <div><dt>Retelling the story</dt><dd>Say why Priestley shows it, not just what happens.</dd></div>
+      <div><dt>Dumping quotes</dt><dd>Every quote has to prove something.</dd></div>
+      <div><dt>Naming techniques</dt><dd>“Dramatic irony” is worthless unless you say what it does.</dd></div>
+      <div><dt>Bolt-on history</dt><dd>Context must explain your point, not sit in its own paragraph.</dd></div>
+    </dl>
+    <h3 class="sub">Before you finish</h3>
+    <ul class="checks">${ESSAY_CHECKS.map((c,i) => `<li><label><input type="checkbox" data-k="essay:${i}"${ticks["essay:"+i] ? " checked" : ""}> ${c}</label></li>`).join("")}</ul>
+    <p class="remember" style="--c:var(--ink)"><strong>The one question to keep asking:</strong> what has Priestley made the audience see, hear or notice here, and how does that answer the question?</p>`);
+});
+
+/* ---------- state ---------- */
+const dotOwners = [...PEOPLE.map(p => p.id), "eva"];
+function drawDots(){
+  dotOwners.forEach(id => {
+    const rows = byId[id].rows;
+    const done = rows.filter((_,i) => ticks[id + ":" + i]).length;
+    const btn = document.querySelector(`.node[data-id="${id}"]`);
+    btn.querySelector(".dots").innerHTML = rows.map((_,i) => `<i class="${i < done ? "on" : ""}"></i>`).join("");
+    btn.setAttribute("aria-label", `${byId[id].name}: ${done} of ${rows.length} ticked`);
+  });
+}
+
+const allIds = Object.keys(byId);
+let showingAll = false;
+function show(id){
+  showingAll = false;
+  document.getElementById("showAll").textContent = "Show everything";
+  if (!allIds.includes(id)) id = "birling";
+  allIds.forEach(k => {
+    document.getElementById("panel-" + k).hidden = k !== id;
+    document.querySelector(`[data-id="${k}"]`).setAttribute("aria-pressed", k === id ? "true" : "false");
+  });
+}
+
+document.querySelector("nav").addEventListener("click", e => {
+  const btn = e.target.closest("[data-id]"); if (!btn) return;
+  if (location.hash === "#" + btn.dataset.id) show(btn.dataset.id);
+  else location.hash = btn.dataset.id;
+});
+window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+
+panelsEl.addEventListener("click", e => {
+  const chip = e.target.closest(".chip"); if (!chip) return;
+  const i = chip.dataset.theme;
+  panelsEl.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c === chip ? "true" : "false"));
+  panelsEl.querySelectorAll(".theme-set").forEach(s => s.hidden = s.dataset.set !== i);
+});
+
+panelsEl.addEventListener("change", e => {
+  const k = e.target.dataset.k; if (!k) return;
+  if (e.target.checked) ticks[k] = true; else delete ticks[k];
+  const row = e.target.closest(".row"); if (row) row.classList.toggle("done", e.target.checked);
+  save(); drawDots();
+});
+
+document.getElementById("showAll").addEventListener("click", ev => {
+  showingAll = !showingAll;
+  if (showingAll){
+    allIds.forEach(k => {
+      const p = document.getElementById("panel-" + k);
+      p.hidden = false; p.style.marginBottom = "2.5rem";
+      document.querySelector(`[data-id="${k}"]`).setAttribute("aria-pressed","false");
+    });
+    ev.target.textContent = "Show one at a time";
+  } else show(location.hash.slice(1));
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  ticks = {}; save();
+  document.querySelectorAll("input[data-k]").forEach(i => i.checked = false);
+  document.querySelectorAll(".row.done").forEach(r => r.classList.remove("done"));
+  drawDots();
+});
+
+drawDots();
+show(location.hash.slice(1));
+</script>
+</body>
+</html>
