@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maths tree: Modules 1–5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F0; --surface:#FFFFFF; --ink:#1F2A2E; --muted:#56676C; --line:#C6D2CF; --soft:#E2E9E7;
+  --c-numbers:#3E6FA8; --c-fractions:#2C7F69; --c-powers:#7454AD; --c-percent:#A96A1E; --c-algebra:#AE4459;
+  --sans:"Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
+  --mono:"Atkinson Hyperlegible Mono", ui-monospace, "Consolas", "Menlo", monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+    --c-numbers:#7FA8DA; --c-fractions:#6CC2A8; --c-powers:#B39AE3; --c-percent:#E2A85E; --c-algebra:#E38699;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+  --c-numbers:#7FA8DA; --c-fractions:#6CC2A8; --c-powers:#B39AE3; --c-percent:#E2A85E; --c-algebra:#E38699;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:1.0625rem;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:60rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0 0 .4rem;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 2rem;max-width:40rem}
+
+/* ---- the tree ---- */
+.tree{position:relative;margin:0 0 2.25rem}
+.root{display:flex;justify-content:center}
+.root span{background:var(--ink);color:var(--bg);font-weight:700;padding:.55rem 1.1rem;border-radius:999px}
+.trunk{width:2px;height:1.4rem;background:var(--line);margin:0 auto}
+.branches{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem;position:relative}
+.branches::before{content:"";position:absolute;top:0;left:10%;right:10%;height:2px;background:var(--line)}
+.branches li{position:relative;padding-top:1.4rem;display:flex}
+.branches li::before{content:"";position:absolute;top:0;left:50%;width:2px;height:1.4rem;background:var(--line)}
+.node{all:unset;box-sizing:border-box;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.35rem;
+  background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:.8rem .5rem .7rem;transition:border-color .15s, background .15s}
+.node:hover{border-color:var(--c)}
+.node:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.node[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+.node .name{font-weight:700;color:var(--c);font-size:1.05rem}
+.node .what{font-size:.85rem;color:var(--muted);line-height:1.3}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:.2rem}
+.dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--c);display:block}
+.dots i.on{background:var(--c)}
+
+@media (max-width:720px){
+  .root{justify-content:flex-start}
+  .trunk{margin:0 0 0 1.5rem;height:.9rem}
+  .branches{grid-template-columns:1fr;gap:.6rem;padding-left:1.5rem}
+  .branches::before{top:0;bottom:1.6rem;left:1.5rem;right:auto;width:2px;height:auto}
+  .branches li{padding:0 0 0 1.25rem}
+  .branches li::before{top:50%;left:0;width:1.25rem;height:2px}
+  .node{flex-direction:row;flex-wrap:wrap;text-align:left;align-items:center;padding:.65rem .85rem;gap:.15rem .75rem}
+  .node .what{flex:1 1 10rem}
+  .dots{justify-content:flex-start;flex-basis:100%;margin:0}
+}
+
+/* ---- leaves ---- */
+.panel{--c:var(--c-numbers)}
+.panel-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem 1rem;margin:0 0 1rem;border-left:5px solid var(--c);padding-left:.85rem}
+.panel-head h2{margin:0;font-size:1.5rem;color:var(--c)}
+.panel-head p{margin:0;color:var(--muted);flex-basis:100%}
+.panel-head .from{font-size:.85rem;color:var(--muted)}
+.leaves{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.leaf{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) auto;gap:.4rem 1.5rem;padding:1rem 1.15rem;border-top:1px solid var(--line);align-items:start}
+.leaf:first-child{border-top:0}
+.leaf h3{margin:0 0 .2rem;font-size:1.05rem}
+.leaf .rule{margin:0;color:var(--ink)}
+.leaf .aka{display:block;margin-top:.35rem;font-size:.85rem;color:var(--muted)}
+.ex{font-family:var(--mono);font-size:.98rem;background:var(--soft);border-radius:8px;padding:.6rem .8rem;line-height:1.9;overflow-x:auto}
+.ex .step{display:block;white-space:nowrap}
+.ex .ans{font-weight:600;color:var(--c)}
+.ex .note{font-family:var(--sans);font-size:.85rem;color:var(--muted);white-space:normal;display:block;line-height:1.4;margin-top:.15rem}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;margin:0 .1em;font-size:.92em}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .2em}
+.fr>span:last-child{padding:0 .2em}
+sup{font-size:.7em;line-height:0}
+.tick{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--muted);cursor:pointer;white-space:nowrap;padding-top:.15rem}
+.tick input{width:1.25rem;height:1.25rem;accent-color:var(--c);cursor:pointer;margin:0}
+.leaf.done h3::after{content:" ✓";color:var(--c)}
+@media (max-width:720px){
+  .leaf{grid-template-columns:1fr auto}
+  .leaf .ex{grid-column:1 / -1;grid-row:2}
+  .leaf .tick{grid-column:2;grid-row:1}
+}
+
+/* ---- jargon ---- */
+.jargon{margin-top:3rem}
+.jargon h2{font-size:1.3rem;margin:0 0 .3rem}
+.jargon>p{color:var(--muted);margin:0 0 1rem}
+.jargon dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.75rem}
+.jargon div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.75rem .95rem}
+.jargon dt{font-weight:700}
+.jargon dd{margin:.15rem 0 0;color:var(--muted);font-size:.95rem}
+
+.tools{display:flex;gap:.75rem;flex-wrap:wrap;margin:1.25rem 0 0}
+.btn{all:unset;cursor:pointer;font-size:.9rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem}
+.btn:hover{color:var(--ink);border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .tree,.tools,.tick{display:none!important}
+  .panel{display:block!important;break-inside:avoid-page;margin-bottom:1.5rem}
+  .ex{background:#f1f1f1}
+  .leaf{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Your maths, as a tree</h1>
+  <p class="lede">Five big ideas. Everything on the key sheets hangs off one of these. Pick a branch to see each skill with one small example.</p>
+
+  <nav class="tree" aria-label="Topics">
+    <div class="root"><span>Maths so far</span></div>
+    <div class="trunk"></div>
+    <ul class="branches" id="branches"></ul>
+  </nav>
+
+  <div id="panels"></div>
+
+  <div class="tools">
+    <button class="btn" id="showAll" type="button">Show every branch</button>
+    <button class="btn" id="reset" type="button">Clear my ticks</button>
+  </div>
+
+  <section class="jargon" aria-labelledby="jh">
+    <h2 id="jh">Same thing, different names</h2>
+    <p>The sheets use lots of words for things you already know. These pairs mean the same.</p>
+    <dl>
+      <div><dt>Index = power = exponent</dt><dd>The small raised number. Indices is just the plural.</dd></div>
+      <div><dt>Directed numbers</dt><dd>Positive and negative numbers.</dd></div>
+      <div><dt>Vulgar / improper fraction</dt><dd>A top-heavy fraction, like <span class="fr"><span>7</span><span>4</span></span>.</dd></div>
+      <div><dt>Reciprocal = multiplicative inverse</dt><dd>Flip it upside down. <span class="fr"><span>2</span><span>3</span></span> becomes <span class="fr"><span>3</span><span>2</span></span>.</dd></div>
+      <div><dt>Subject of a formula</dt><dd>The letter on its own, before the equals sign.</dd></div>
+      <div><dt>Like terms</dt><dd>Terms with exactly the same letters and powers, so they can be added.</dd></div>
+      <div><dt>Common factor</dt><dd>Something every term can be divided by.</dd></div>
+      <div><dt>Depreciation</dt><dd>Losing value by the same percentage each year.</dd></div>
+    </dl>
+  </section>
+</main>
+
+<script>
+const f = (a,b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const s = t => `<span class="step">${t}</span>`;
+const a = t => `<span class="step ans">${t}</span>`;
+const n = t => `<span class="note">${t}</span>`;
+
+const TREE = [
+ { id:"numbers", name:"Numbers", what:"Signs, order, rounding", from:"Module 1",
+   intro:"Working with plain numbers: negatives, the order you do things in, and rounding.",
+   leaves:[
+    {t:"Negative numbers", r:"Multiplying or dividing: same signs give +, different signs give −.", aka:"Also called directed numbers.",
+     ex:s("−3 × −4 = 12")+s("−12 ÷ 3 = −4")+s("−5 + 8 = 3")},
+    {t:"Order of operations", r:"Brackets, then powers, then × and ÷, then + and −.", aka:"BIDMAS.",
+     ex:s("3 + 4 × 2")+s("= 3 + 8")+a("= 11")+n("Not 14: the × goes first.")},
+    {t:"Decimals, fractions, percentages", r:"Three ways of writing the same amount.",
+     ex:s(`0.75 = ${f(3,4)} = 75%`)+s(`0.333… = ${f(1,3)}`)+n("0.333… is recurring: the 3s go on forever.")},
+    {t:"Rounding", r:"Look at the next digit. 5 or more rounds up.", aka:"dp = decimal places, sf = significant figures.",
+     ex:s("3.476 to 1 dp = 3.5")+s("3.476 to 2 sf = 3.5")+s("4872 to nearest 100 = 4900")},
+    {t:"Estimating", r:"Round every number to 1 significant figure, then work it out.",
+     ex:s("48 × 21")+s("≈ 50 × 20")+a("≈ 1000")},
+    {t:"Bounds", r:"The smallest and largest a rounded number could really have been.", aka:"Upper bound and lower bound.",
+     ex:s("7 cm, to the nearest cm")+a("between 6.5 and 7.5 cm")},
+    {t:"Rational or irrational", r:"Rational numbers can be written as a fraction. Irrational ones can’t.",
+     ex:s(`${f(1,3)}, 0.75, 5 → rational`)+s("π, √2 → irrational")},
+   ]},
+ { id:"fractions", name:"Fractions", what:"Parts of a whole", from:"Module 2",
+   intro:"Four operations with fractions. The only new trick is dividing.",
+   leaves:[
+    {t:"Simplify", r:"Divide top and bottom by the same number.",
+     ex:s(`${f(12,18)} ÷ 6 on top and bottom`)+a(`= ${f(2,3)}`)},
+    {t:"Add and subtract", r:"Make the bottoms the same first. Then add the tops.",
+     ex:s(`${f(1,3)} + ${f(1,4)}`)+s(`= ${f(4,12)} + ${f(3,12)}`)+a(`= ${f(7,12)}`)},
+    {t:"Multiply", r:"Top × top, bottom × bottom.",
+     ex:s(`${f(2,3)} × ${f(3,5)} = ${f(6,15)}`)+a(`= ${f(2,5)}`)},
+    {t:"Divide", r:"Flip the second fraction, then multiply.", aka:"The flipped one is the reciprocal.",
+     ex:s(`${f(2,3)} ÷ ${f(4,5)}`)+s(`= ${f(2,3)} × ${f(5,4)} = ${f(10,12)}`)+a(`= ${f(5,6)}`)},
+    {t:"Mixed numbers", r:"Turn them top-heavy before you multiply or divide.",
+     ex:s(`1${f(1,2)} = ${f(3,2)}`)+s(`2${f(1,3)} = ${f(7,3)}`)},
+    {t:"Fractions with letters", r:"Exactly the same rules, with x in the top.", aka:"Algebraic fractions.",
+     ex:s(`${f("x",3)} + ${f("x",4)}`)+s(`= ${f("4x",12)} + ${f("3x",12)}`)+a(`= ${f("7x",12)}`)},
+   ]},
+ { id:"powers", name:"Powers", what:"Small raised numbers", from:"Modules 1, 2 and 5",
+   intro:"This branch shows up on four different sheets, but it’s the same six rules every time.",
+   leaves:[
+    {t:"What a power means", r:"How many times to multiply the number by itself.", aka:"Also called an index or exponent.",
+     ex:s("2<sup>3</sup> = 2 × 2 × 2")+a("= 8")},
+    {t:"Multiplying: add the powers", r:"Same base letter or number? Add the small numbers.",
+     ex:s("a<sup>3</sup> × a<sup>4</sup>")+a("= a<sup>7</sup>")},
+    {t:"Dividing: subtract the powers", r:"Same base? Take the second power away from the first.",
+     ex:s("a<sup>6</sup> ÷ a<sup>2</sup>")+a("= a<sup>4</sup>")},
+    {t:"Power of a power: multiply", r:"A power outside a bracket multiplies the one inside.",
+     ex:s("(a<sup>2</sup>)<sup>3</sup>")+a("= a<sup>6</sup>")},
+    {t:"Power of 0 is always 1", r:"Anything (except 0) to the power 0 equals 1.",
+     ex:s("7<sup>0</sup> = 1")+s("x<sup>0</sup> = 1")},
+    {t:"Negative power: flip it", r:"Put it under 1, and make the power positive.",
+     ex:s(`5<sup>−2</sup> = ${f("1","5<sup>2</sup>")}`)+a(`= ${f(1,25)}`)},
+    {t:"Fraction power: take a root", r:"½ means square root. ⅓ means cube root.",
+     ex:s("9<sup>½</sup> = √9 = 3")+s("8<sup>⅓</sup> = ∛8 = 2")},
+    {t:"Standard form", r:"A number between 1 and 10, times a power of 10.", aka:"Used for very big or very small numbers.",
+     ex:s("4500 = 4.5 × 10<sup>3</sup>")+s("0.003 = 3 × 10<sup>−3</sup>")},
+   ]},
+ { id:"percent", name:"Percentages", what:"Out of 100", from:"Module 3",
+   intro:"Nearly every percentage question is one multiplication. Find the right multiplier.",
+   leaves:[
+    {t:"Percentage of an amount", r:"Turn the % into a decimal and multiply.",
+     ex:s("15% of 120")+s("= 0.15 × 120")+a("= 18")},
+    {t:"Multipliers", r:"Going up: 1 plus the decimal. Going down: 1 minus it.", aka:"The sheet calls this a multiplicative operator.",
+     ex:s("up 20%   → × 1.2")+s("down 20% → × 0.8")},
+    {t:"Increase or decrease", r:"Multiply by the multiplier. One step.",
+     ex:s("£50 up by 10%")+s("= 50 × 1.1")+a("= £55")},
+    {t:"Going backwards", r:"Know the new price? Divide by the multiplier to get the original.", aka:"Reverse percentage.",
+     ex:s("After 20% off it costs £40")+s("40 ÷ 0.8")+a("= £50 originally")},
+    {t:"Again and again", r:"Use the multiplier to the power of how many times.", aka:"Compound interest (going up) or depreciation (going down).",
+     ex:s("£200, 5% interest, 3 years")+s("= 200 × 1.05<sup>3</sup>")+a("= £231.53")+s("£10 000 car, loses 10% a year, 2 years")+s("= 10 000 × 0.9<sup>2</sup>")+a("= £8100")},
+   ]},
+ { id:"algebra", name:"Algebra", what:"Letters for numbers", from:"Modules 4 and 5",
+   intro:"Letters follow the same rules as numbers. This branch is about tidying, solving and rearranging.",
+   leaves:[
+    {t:"Collect like terms", r:"Add up the x’s together, and the y’s together.", aka:"Simplifying.",
+     ex:s("3x + 2y + 5x")+a("= 8x + 2y")},
+    {t:"Expand brackets", r:"Multiply the outside by everything inside.",
+     ex:s("3(x + 4)")+a("= 3x + 12")},
+    {t:"Factorise", r:"The reverse: take out what every term shares.",
+     ex:s("6x + 9")+a("= 3(2x + 3)")},
+    {t:"Substitute", r:"Swap the letter for its number. Keep negatives in brackets.",
+     ex:s("3x<sup>2</sup> when x = −2")+s("= 3 × (−2)<sup>2</sup> = 3 × 4")+a("= 12")},
+    {t:"Solve an equation", r:"Do the same thing to both sides until x is alone.",
+     ex:s("5x + 3 = 2x + 12")+s("3x + 3 = 12   (−2x)")+s("3x = 9        (−3)")+a("x = 3        (÷3)")},
+    {t:"Inequalities", r:"Solve like an equation, but keep the < or > sign.", aka:"On a number line: open circle for < and >, filled for ≤ and ≥.",
+     ex:s("2x + 1 < 7")+s("2x < 6")+a("x < 3")},
+    {t:"Rearrange a formula", r:"Same as solving, but you end with a letter instead of a number.", aka:"Changing the subject.",
+     ex:s("v = u + at   → make t the subject")+s("v − u = at")+a(`t = ${f("v − u","a")}`)},
+    {t:"Letter appears twice", r:"Get both onto one side, then factorise it out.",
+     ex:s("ax = b + cx")+s("ax − cx = b")+s("x(a − c) = b")+a(`x = ${f("b","a − c")}`)},
+   ]},
+];
+
+const KEY = "maths-tree-ticks";
+let ticks = {};
+try { ticks = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { ticks = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(ticks)); } catch(e){} };
+
+const branchesEl = document.getElementById("branches");
+const panelsEl = document.getElementById("panels");
+
+TREE.forEach(b => {
+  const li = document.createElement("li");
+  li.innerHTML = `<button class="node" type="button" style="--c:var(--c-${b.id})" data-id="${b.id}" aria-controls="panel-${b.id}" aria-pressed="false">
+    <span class="name">${b.name}</span><span class="what">${b.what}</span><span class="dots" aria-hidden="true"></span></button>`;
+  branchesEl.appendChild(li);
+
+  const sec = document.createElement("section");
+  sec.className = "panel"; sec.id = "panel-" + b.id; sec.hidden = true;
+  sec.style.setProperty("--c", `var(--c-${b.id})`);
+  sec.innerHTML = `<div class="panel-head"><h2>${b.name}</h2><span class="from">From ${b.from}</span><p>${b.intro}</p></div>
+    <ul class="leaves">${b.leaves.map((l,i) => {
+      const k = b.id + ":" + i;
+      return `<li class="leaf${ticks[k] ? " done" : ""}" data-k="${k}">
+        <div><h3>${l.t}</h3><p class="rule">${l.r}</p>${l.aka ? `<span class="aka">${l.aka}</span>` : ""}</div>
+        <div class="ex">${l.ex}</div>
+        <label class="tick"><input type="checkbox" data-k="${k}"${ticks[k] ? " checked" : ""}> I can do this</label>
+      </li>`; }).join("")}</ul>`;
+  panelsEl.appendChild(sec);
+});
+
+function drawDots(){
+  TREE.forEach(b => {
+    const dots = branchesEl.querySelector(`[data-id="${b.id}"] .dots`);
+    const done = b.leaves.filter((_,i) => ticks[b.id + ":" + i]).length;
+    dots.innerHTML = b.leaves.map((_,i) => `<i class="${i < done ? "on" : ""}"></i>`).join("");
+    dots.parentElement.setAttribute("aria-label", `${b.name}: ${done} of ${b.leaves.length} ticked`);
+  });
+}
+
+let showingAll = false;
+function show(id){
+  showingAll = false;
+  document.getElementById("showAll").textContent = "Show every branch";
+  if (!TREE.some(b => b.id === id)) id = TREE[0].id;
+  TREE.forEach(b => {
+    document.getElementById("panel-" + b.id).hidden = b.id !== id;
+    branchesEl.querySelector(`[data-id="${b.id}"]`).setAttribute("aria-pressed", b.id === id ? "true" : "false");
+  });
+}
+
+branchesEl.addEventListener("click", e => {
+  const btn = e.target.closest(".node"); if (!btn) return;
+  if (location.hash === "#" + btn.dataset.id) show(btn.dataset.id);
+  else location.hash = btn.dataset.id;
+});
+window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+
+panelsEl.addEventListener("change", e => {
+  const k = e.target.dataset.k; if (!k) return;
+  if (e.target.checked) ticks[k] = true; else delete ticks[k];
+  e.target.closest(".leaf").classList.toggle("done", e.target.checked);
+  save(); drawDots();
+});
+
+document.getElementById("showAll").addEventListener("click", ev => {
+  showingAll = !showingAll;
+  if (showingAll){
+    TREE.forEach(b => {
+      document.getElementById("panel-" + b.id).hidden = false;
+      branchesEl.querySelector(`[data-id="${b.id}"]`).setAttribute("aria-pressed","false");
+    });
+    document.querySelectorAll(".panel").forEach(p => p.style.marginBottom = "2rem");
+    ev.target.textContent = "Show one branch";
+  } else show(location.hash.slice(1));
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  ticks = {}; save();
+  document.querySelectorAll(".tick input").forEach(i => i.checked = false);
+  document.querySelectorAll(".leaf").forEach(l => l.classList.remove("done"));
+  drawDots();
+});
+
+drawDots();
+show(location.hash.slice(1));
+</script>
+</body>
+</html>
