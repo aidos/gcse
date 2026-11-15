@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Revision maps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F0; --surface:#FFFFFF; --ink:#1F2A2E; --muted:#56676C; --line:#C6D2CF;
+  --c1:#3E6FA8; --c2:#2C7F69; --c3:#7454AD; --c4:#AE4459; --c5:#A96A1E; --c6:#7A6A36; --c7:#36525E;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C;
+    --c1:#7FA8DA; --c2:#6CC2A8; --c3:#B39AE3; --c4:#E38699; --c5:#E2A85E; --c6:#CDBB86; --c7:#A9C3CC;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible","Verdana","Segoe UI",system-ui,sans-serif;font-size:1.0625rem;line-height:1.5}
+main{max-width:44rem;margin:0 auto;padding:2.5rem 1.25rem 4rem}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0 0 .4rem}
+p{color:var(--muted);margin:0 0 2rem}
+ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:.75rem}
+a{display:block;text-decoration:none;color:var(--c);font-weight:700;font-size:1.15rem;background:var(--surface);
+  border:2px solid var(--line);border-left:6px solid var(--c);border-radius:14px;padding:1rem 1.1rem}
+a:hover{border-color:var(--c)}
+a:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Revision maps</h1>
+  <p>Pick a subject.</p>
+  <ul>
+    <li><a href="maths.html" style="--c:var(--c1)">Maths</a></li>
+    <li><a href="english-language.html" style="--c:var(--c2)">English Language</a></li>
+    <li><a href="english-literature.html" style="--c:var(--c3)">English Literature</a></li>
+    <li><a href="biology.html" style="--c:var(--c4)">Biology</a></li>
+    <li><a href="physics.html" style="--c:var(--c5)">Physics</a></li>
+    <li><a href="classics.html" style="--c:var(--c6)">Classics</a></li>
+    <li><a href="music.html" style="--c:var(--c7)">Music</a></li>
+  </ul>
+</main>
+</body>
+</html>
