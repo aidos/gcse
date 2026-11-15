@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Physics: forces, motion and electricity</title>
+<!--
+  REVISION MAP BASE TEMPLATE
+  ==========================
+  Everything you change lives in the DATA section inside <script> near the bottom.
+  The CSS and the engine below it are shared across every subject page; leave them alone
+  unless a subject genuinely needs something new (then add it, don't fork it).
+
+  Nav shapes (set DATA.nav.shape):
+    "tree"   : root pill -> one row of branch nodes            (e.g. Maths: 5 big ideas)
+    "chain"  : numbered row of nodes -> optional hub node below (e.g. Inspector Calls: questioning order -> Eva)
+    "groups" : root pill -> labelled groups, each with 2-3 nodes (e.g. English Language: Paper 1 / Paper 2 -> Read / Write)
+  Extras (DATA.nav.extras) render as pills under the shape: cross-cutting views like Themes, Essay, Skills.
+
+  Section blocks (in order, any combination) : see BLOCK TYPES comment in DATA.
+  Only "rows" blocks are tickable; their ticks fill the dots on that section's node.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F0; --surface:#FFFFFF; --ink:#1F2A2E; --muted:#56676C; --line:#C6D2CF; --soft:#E2E9E7;
+  /* section colours (c7 added for 7-node pages) + a neutral for tools/extras */
+  --c1:#3E6FA8; --c2:#2C7F69; --c3:#7454AD; --c4:#AE4459; --c5:#A96A1E; --c6:#7A6A36; --c7:#2A7792; --c-tool:#36525E;
+  --sans:"Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
+  --mono:"Atkinson Hyperlegible Mono", ui-monospace, "Consolas", "Menlo", monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+    --c1:#7FA8DA; --c2:#6CC2A8; --c3:#B39AE3; --c4:#E38699; --c5:#E2A85E; --c6:#CDBB86; --c7:#79C1DA; --c-tool:#A9C3CC;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+  --c1:#7FA8DA; --c2:#6CC2A8; --c3:#B39AE3; --c4:#E38699; --c5:#E2A85E; --c6:#CDBB86; --c7:#79C1DA; --c-tool:#A9C3CC;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:1.0625rem;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:62rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0 0 .4rem;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 2rem;max-width:42rem}
+
+/* ---------- nav: shared pieces ---------- */
+.root{display:flex;justify-content:center}
+.root span{background:var(--ink);color:var(--bg);font-weight:700;padding:.55rem 1.1rem;border-radius:999px}
+.trunk{width:2px;height:1.4rem;background:var(--line);margin:0 auto}
+.cap{font-size:.9rem;color:var(--muted);margin:0 0 .6rem;text-align:center}
+.node{all:unset;box-sizing:border-box;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.3rem;
+  background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:.75rem .5rem .7rem;transition:border-color .15s, background .15s}
+.node:hover{border-color:var(--c)}
+.node:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.node[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+.node .num{font-size:.8rem;font-weight:700;color:var(--surface);background:var(--c);border-radius:999px;width:1.5rem;height:1.5rem;display:grid;place-items:center}
+.node .name{font-weight:700;color:var(--c);font-size:1.05rem;line-height:1.2}
+.node .what{font-size:.85rem;color:var(--muted);line-height:1.3}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:.15rem}
+.dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--c);display:block}
+.dots i.on{background:var(--c)}
+.extras{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin:1.5rem 0 2.25rem}
+.pill{all:unset;cursor:pointer;box-sizing:border-box;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:.45rem 1rem;font-weight:700;color:var(--c);font-size:.95rem}
+.pill:hover{border-color:var(--c)}
+.pill:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.pill[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+nav:not(:has(.extras:not(:empty))){margin-bottom:2.25rem}
+
+/* row of nodes hanging DOWN from a rail (tree, groups) */
+.hang{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:.75rem;position:relative}
+.hang::before{content:"";position:absolute;top:0;left:calc(50% / var(--n));right:calc(50% / var(--n));height:2px;background:var(--line)}
+.hang>li{position:relative;padding-top:1.3rem;display:flex}
+.hang>li::before{content:"";position:absolute;top:0;left:50%;width:2px;height:1.3rem;background:var(--line)}
+
+/* chain: nodes joined UP into a rail that drops to a hub */
+.chainrow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:.75rem;position:relative}
+.chainrow.has-hub::after{content:"";position:absolute;bottom:0;left:calc(50% / var(--n));right:calc(50% / var(--n));height:2px;background:var(--line)}
+.chainrow>li{position:relative;display:flex}
+.chainrow.has-hub>li{padding-bottom:1.3rem}
+.chainrow.has-hub>li::after{content:"";position:absolute;bottom:0;left:50%;width:2px;height:1.3rem;background:var(--line)}
+.hub{display:flex;justify-content:center}
+.hub .node{flex:0 1 20rem}
+
+/* groups */
+.groups{display:grid;grid-template-columns:repeat(var(--g),1fr);gap:1.5rem;position:relative}
+.groups::before{content:"";position:absolute;top:0;left:calc(50% / var(--g));right:calc(50% / var(--g));height:2px;background:var(--line)}
+.group{position:relative;padding-top:1.4rem}
+.group::before{content:"";position:absolute;top:0;left:50%;width:2px;height:1.4rem;background:var(--line)}
+.glabel{text-align:center;border:2px dashed var(--line);border-radius:12px;padding:.5rem .75rem}
+.glabel b{display:block;font-size:1.1rem}
+.glabel span{font-size:.88rem;color:var(--muted)}
+.group .trunk{height:1.2rem}
+
+@media (max-width:720px){
+  .root{justify-content:flex-start}
+  .trunk{margin-left:1.5rem;height:.9rem}
+  .cap{text-align:left}
+  /* tree + chain become a vertical file-tree */
+  .shape-tree .hang,.shape-chain .chainrow{grid-template-columns:1fr;gap:.6rem;padding-left:1.5rem}
+  .shape-tree .hang::before,.shape-chain .chainrow.has-hub::after{top:0;bottom:0;left:1.5rem;right:auto;width:2px;height:auto}
+  .shape-tree .hang::before{bottom:1.6rem}
+  .shape-tree .hang>li,.shape-chain .chainrow>li{padding:0 0 0 1.25rem}
+  .shape-tree .hang>li::before,.shape-chain .chainrow.has-hub>li::after{top:50%;bottom:auto;left:0;width:1.25rem;height:2px}
+  .shape-tree .node,.shape-chain .node{flex-direction:row;flex-wrap:wrap;text-align:left;align-items:center;padding:.6rem .85rem;gap:.15rem .65rem}
+  .shape-tree .node .what,.shape-chain .node .what{flex:1 1 9rem}
+  .shape-tree .dots,.shape-chain .dots{justify-content:flex-start;flex-basis:100%;margin:0}
+  .hub{justify-content:flex-start}.hub .node{flex:1}
+  /* groups stack, each keeps its own small tree */
+  .shape-groups .root,.shape-groups>.trunk,.groups::before,.group::before{display:none}
+  .groups{grid-template-columns:1fr;gap:1.25rem}
+  .group{padding-top:0}
+  .group .trunk{margin:0 auto}
+  .extras{justify-content:flex-start}
+}
+
+/* ---------- panels ---------- */
+.panel-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem 1rem;margin:0 0 1rem;border-left:5px solid var(--c);padding-left:.85rem}
+.panel-head h2{margin:0;font-size:1.5rem;color:var(--c)}
+.panel-head .from{font-size:.85rem;color:var(--muted)}
+.panel-head p{margin:0;color:var(--muted);flex-basis:100%}
+.sub{font-size:1.1rem;margin:1.5rem 0 .6rem}
+.panel>.sub:first-of-type{margin-top:.5rem}
+
+.facts{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:.75rem;margin:0 0 1rem}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem}
+.fact h3{margin:0 0 .25rem;font-size:.85rem;color:var(--muted);font-weight:400}
+.fact p{margin:0}
+.fact ul:not(.words){margin:.2rem 0 0;padding-left:1.1rem}
+.fact .eg{display:block;margin-top:.4rem;font-size:.92rem;color:var(--muted)}
+.words{display:flex;flex-wrap:wrap;gap:.4rem;margin:.35rem 0 0;padding:0;list-style:none}
+.words li{border:2px solid var(--c);color:var(--c);border-radius:999px;padding:.05rem .6rem;font-weight:700;font-size:.92rem}
+.badge{display:inline-block;font-weight:700;border-radius:999px;padding:.1rem .65rem;font-size:.95rem;border:2px solid currentColor}
+.badge.yes{color:var(--c2)} .badge.no{color:var(--c4)} .badge.part{color:var(--c5)}
+@media (max-width:720px){.facts{grid-template-columns:1fr}}
+
+.rows{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto;gap:.4rem 1.5rem;padding:1rem 1.15rem;border-top:1px solid var(--line);align-items:start}
+.row:first-child{border-top:0}
+.row h4{margin:0;font-size:1.05rem}
+.row .aka{display:block;margin-top:.2rem;font-size:.85rem;color:var(--muted)}
+.row .q{margin:.45rem 0 0;font-style:italic;border-left:3px solid var(--c);padding-left:.7rem}
+.row .q.lead{margin-top:0;font-size:1.08rem}
+.explain{background:var(--soft);border-radius:8px;padding:.6rem .8rem;overflow-x:auto}
+.explain p{margin:0}
+.explain .eg{display:block;margin-top:.35rem;font-size:.92rem;font-style:italic}
+.explain .method{display:block;margin-top:.35rem;font-size:.88rem;color:var(--muted)}
+.explain.maths{font-family:var(--mono);line-height:1.9}
+.explain.maths .step{display:block;white-space:nowrap}
+.explain.maths .ans{font-weight:600;color:var(--c)}
+.explain.maths .note{font-family:var(--sans);font-size:.85rem;color:var(--muted);display:block;line-height:1.4;white-space:normal}
+.tick{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--muted);cursor:pointer;white-space:nowrap;padding-top:.15rem}
+.tick input{width:1.25rem;height:1.25rem;accent-color:var(--c);cursor:pointer;margin:0}
+.row.done h4::after,.row.done .q.lead::after{content:" ✓";font-style:normal;color:var(--c)}
+@media (max-width:720px){
+  .row{grid-template-columns:1fr auto}
+  .row .explain{grid-column:1 / -1;grid-row:2}
+  .row .tick{grid-column:2;grid-row:1}
+}
+
+.flow{list-style:none;margin:0;padding:0;counter-reset:fl;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.flow li{counter-increment:fl;display:grid;grid-template-columns:2.2rem minmax(0,12rem) minmax(0,1fr);gap:.3rem 1rem;padding:.8rem 1.1rem;border-top:1px solid var(--line);align-items:start}
+.flow li:first-child{border-top:0}
+.flow li::before{content:counter(fl);font-weight:700;color:var(--surface);background:var(--c);border-radius:999px;width:1.7rem;height:1.7rem;display:grid;place-items:center;font-size:.9rem}
+.flow b{display:block}
+.flow .job{font-size:.88rem;color:var(--muted)}
+.flow .line{font-style:italic;background:var(--soft);border-radius:8px;padding:.45rem .7rem}
+@media (max-width:620px){.flow li{grid-template-columns:2.2rem 1fr}.flow .line{grid-column:2}}
+
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{text-align:left;padding:.75rem .95rem;border-top:1px solid var(--line);vertical-align:top}
+.tbl thead th{border-top:0;font-size:.9rem;color:var(--muted)}
+.tbl td:first-child{font-weight:700}
+.tbl .src{display:block;font-size:.82rem;color:var(--muted);font-weight:400;margin-top:.15rem}
+
+.checks{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.checks li{border-top:1px solid var(--line);padding:.65rem 1rem}
+.checks li:first-child{border-top:0}
+.checks label{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer}
+.checks input{width:1.2rem;height:1.2rem;margin:.2rem 0 0;accent-color:var(--c);flex:none}
+
+.remember{margin:1rem 0 0;padding:.85rem 1rem;border:2px dashed var(--c);border-radius:12px}
+.remember strong{color:var(--c)}
+
+/* inline helpers usable in any text */
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;margin:0 .1em;font-size:.92em}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .2em}
+.fr>span:last-child{padding:0 .2em}
+sup{font-size:.7em;line-height:0}
+
+/* ---------- jargon + tools ---------- */
+.jargon{margin-top:3rem}
+.jargon h2{font-size:1.3rem;margin:0 0 .3rem}
+.jargon>p{color:var(--muted);margin:0 0 1rem}
+.jargon dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.75rem}
+.jargon div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.75rem .95rem}
+.jargon dt{font-weight:700}
+.jargon dd{margin:.15rem 0 0;color:var(--muted);font-size:.95rem}
+.tools{display:flex;gap:.75rem;flex-wrap:wrap;margin:1.25rem 0 0}
+.btn{all:unset;cursor:pointer;font-size:.9rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem}
+.btn:hover{color:var(--ink);border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  nav,.tools,.tick{display:none!important}
+  .panel{display:block!important;margin-bottom:1.5rem}
+  .row,.flow li{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1 id="title"></h1>
+  <p class="lede" id="lede"></p>
+  <nav id="nav" aria-label="Topics"></nav>
+  <div id="panels"></div>
+  <div class="tools">
+    <button class="btn" id="showAll" type="button">Show everything</button>
+    <button class="btn" id="reset" type="button">Clear my ticks</button>
+  </div>
+  <section class="jargon" id="jargon" aria-labelledby="jh"></section>
+</main>
+
+<script>
+/* ---------- inline helpers for content strings ---------- */
+const f  = (a,b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;   // stacked fraction
+const s  = t => `<span class="step">${t}</span>`;          // maths working line   (use with style:"maths")
+const a  = t => `<span class="step ans">${t}</span>`;      // maths answer line
+const nt = t => `<span class="note">${t}</span>`;          // maths side note
+
+/* =====================================================================
+   DATA : the only part to edit
+   =====================================================================
+   BLOCK TYPES (inside a section's "blocks" array):
+     {type:"facts", head?, cards:[{h, p? , list?:[..], words?:[..], badge?:["yes"|"no"|"part","Label"], eg?}]}
+         2-3 summary cards. words = coloured chips. badge = Accepts/Refuses style label.
+     {type:"rows", head?, tick:"I can do this", style?:"maths", items:[{t, aka?, q?, lead?:true, e, eg?, m?}]}
+         The tickable list. t = title, aka = "Also called…", q = quotation (no quote marks),
+         lead:true shows the quote as the headline instead of t, e = explanation, eg = example, m = method/effect line.
+         style:"maths" puts e in a monospace working box; build e with s()/a()/nt().
+     {type:"flow", head?, steps:[[title, job, exampleLine], …]}   numbered steps: ONLY for real sequences
+     {type:"table", head?, cols:[…], rows:[[…], …], srcCol?:index}  srcCol = small grey note under first cell
+     {type:"checks", head?, items:[…]}                            tickable self-check list (not counted in dots)
+     {type:"remember", label?:"Remember", text}
+     {type:"html", html}                                          escape hatch for a one-off (e.g. an SVG diagram)
+   Colours: c1–c6 for sections, "tool" for extras/cross-cutting views.
+   ===================================================================== */
+const DATA = {
+  storageKey: "revision-map-physics-forces-electricity",
+  title: "Physics: forces, motion and electricity",
+  lede: "Eight key sheets, but really three groups: forces, what forces do to moving things, and electricity. Most of the maths is one equation shape used seven times. Pick a branch to start.",
+
+  nav: {
+    shape: "groups",
+    root: "Physics",
+    caption: "",
+    groups: [
+      { label:"Forces", sub:"Pushing, stretching, turning", nodes:["forces","springs","moments"] },
+      { label:"Motion", sub:"What forces do to moving things", nodes:["motion","momentum"] },
+      { label:"Electricity", sub:"Charge going round a loop", nodes:["circuits","components"] },
+    ],
+    hub: null,
+    extras: ["equations","graphs"],
+  },
+
+  sections: {
+
+    /* ---------------- FORCES ---------------- */
+    forces: { name:"Forces", what:"Arrows, mass, weight", c:"c1", from:"Forces sheet and Year 10 Forces sheet",
+      title:"Forces and balance", intro:"Two sheets cover this and they share about ten of the same words. It all comes down to: draw the arrows, then add them up.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"What a force is", p:"A push or a pull. Measured in newtons (N) with a force meter."},
+          {h:"Two kinds", list:["Contact: friction, tension, upthrust, normal force, thrust","Non-contact: gravity, magnetism"]},
+          {h:"Mass is not weight", p:"Mass is how much stuff (kg). Weight is gravity’s pull on it (N)."},
+        ]},
+        {type:"rows", head:"Things to know", tick:"I can do this", items:[
+          {t:"Contact or non-contact", e:"Ask: do they have to touch? Yes means contact. No means non-contact.", eg:"A magnet pulling a paperclip across a gap is non-contact."},
+          {t:"Find the resultant force", aka:"Also called the net force.", e:"Draw the arrows. Same direction: add them. Opposite directions: take the smaller from the bigger.", eg:"30 N right and 20 N left gives 10 N to the right."},
+          {t:"Balanced or unbalanced", aka:"Balanced forces mean the object is in equilibrium.", e:"Balanced: the resultant is zero, so the motion doesn’t change. Unbalanced: it speeds up, slows down or changes direction.", eg:"A book on a table: weight down, normal force up, balanced."},
+          {t:"Weight from mass", aka:"W = mg. g is gravity’s pull, about 9.8 N/kg on Earth.", e:"Weight = mass × g.", eg:"A 50 kg person weighs about 490 N."},
+          {t:"Mass stays, weight changes", e:"Go to the Moon and your mass is the same. Your weight is less, because gravity there is weaker."},
+          {t:"Floating", e:"Something floats when the upthrust pushing up equals its weight pulling down. Balanced forces again."},
+        ]},
+        {type:"rows", head:"Worked examples", tick:"I can do this", style:"maths", items:[
+          {t:"Resultant force", e: s("30 N right, 20 N left") + s("30 − 20") + a("= 10 N to the right") + nt("The resultant points the way of the bigger force.")},
+          {t:"Weight", e: s("mass 50 kg, g = 9.8 N/kg") + s("W = 50 × 9.8") + a("= 490 N") + nt("The exam paper tells you which value of g to use.")},
+          {t:"Mass from weight", e: s("weight 98 N, g = 9.8 N/kg") + s("m = 98 ÷ 9.8") + a("= 10 kg")},
+        ]},
+        {type:"remember", text:"Every forces question starts the same way: draw the arrows, then add them up."},
+      ]},
+
+    springs: { name:"Springs", what:"Stretch, Hooke’s law", c:"c2", from:"Springs and falling objects sheet (first half), Year 10 Forces sheet",
+      title:"Springs and stretching", intro:"One rule: double the force, double the stretch. That works until you stretch it too far.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"The rule", p:"F = k × x. Force = spring constant × extension."},
+          {h:"The units", list:["F in newtons (N)","x in metres (m)","k in newtons per metre (N/m)"]},
+          {h:"Elastic", p:"Goes back to its natural length when you let go."},
+        ]},
+        {type:"rows", head:"Things to know", tick:"I can do this", items:[
+          {t:"Extension", aka:"Also called stretch.", e:"How much longer it got: new length minus natural length. Not the new length itself.", eg:"Natural length 10 cm, stretched to 14 cm: the extension is 4 cm."},
+          {t:"Hooke’s law", aka:"Extension is directly proportional to force.", e:"Double the force and the extension doubles.", eg:"If 2 N stretches it 3 cm, then 4 N stretches it 6 cm."},
+          {t:"Spring constant", aka:"Also called k, stiffness or force constant.", e:"A big k means a stiff spring that’s hard to stretch.", eg:"A car spring has a much bigger k than a spring from a pen."},
+          {t:"Elastic limit", e:"Stretch it past this and it stays stretched for good. Hooke’s law stops working."},
+          {t:"Restoring force", e:"The spring pulls back towards its natural length.", eg:"Stretch a spring and you feel it pulling your hand back."},
+          {t:"Force meter", aka:"Also called a newton meter or spring balance.", e:"A spring with a scale. More force, more stretch, bigger reading."},
+        ]},
+        {type:"rows", head:"Worked examples", tick:"I can do this", style:"maths", items:[
+          {t:"Find the force", e: s("k = 40 N/m") + s("x = 5 cm = 0.05 m") + s("F = 40 × 0.05") + a("= 2 N") + nt("Change cm to m first.")},
+          {t:"Find the extension", e: s("F = 6 N, k = 200 N/m") + s(`x = ${f("F","k")} = ${f(6,200)}`) + a("= 0.03 m (3 cm)")},
+        ]},
+        {type:"remember", text:"Extension is the change in length, and it goes into the equation in metres."},
+      ]},
+
+    moments: { name:"Moments", what:"Turning and balancing", c:"c3", from:"Moments sheet",
+      title:"Moments: forces that turn", intro:"A force can turn something as well as move it. More force, or further from the pivot, means more turning.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"The rule", p:"Moment = force × distance from the pivot. Unit: newton metres (N m)."},
+          {h:"Balanced", p:"Total clockwise = total anticlockwise. Then it doesn’t turn."},
+          {h:"Key words", words:["pivot","clockwise","anticlockwise","lever"]},
+        ]},
+        {type:"rows", head:"Things to know", tick:"I can do this", items:[
+          {t:"Find the pivot first", e:"The point it turns around. Then find where each force acts.", eg:"Seesaw: the middle. Door: the hinges."},
+          {t:"Use the perpendicular distance", aka:"Perpendicular means at right angles.", e:"Measure from the pivot to the force’s line, at right angles to it.", eg:"A spanner pushed at a slant turns less than one pushed straight."},
+          {t:"Further away, bigger turn", e:"Same force, further from the pivot, bigger moment.", eg:"That’s why door handles are far from the hinges."},
+          {t:"Clockwise or anticlockwise", e:"Imagine only that one force acting. Which way would it spin?"},
+          {t:"Principle of moments", aka:"Balanced moments mean equilibrium.", e:"If it’s balanced, the clockwise moments add up to the same as the anticlockwise ones."},
+          {t:"Centre of mass", e:"The point where all the weight seems to act.", eg:"A ruler’s centre of mass is in the middle."},
+        ]},
+        {type:"rows", head:"Worked examples", tick:"I can do this", style:"maths", items:[
+          {t:"Find a moment", e: s("20 N, 0.5 m from pivot") + s("moment = 20 × 0.5") + a("= 10 N m")},
+          {t:"Balance a seesaw", e: s("300 N child, 2 m left") + s("anticlockwise:") + s("300 × 2 = 600 N m") + s("400 N child on right:") + s("400 × d = 600") + s(`d = ${f(600,400)}`) + a("= 1.5 m from the pivot") + nt("The heavier child sits closer in.")},
+        ]},
+        {type:"remember", text:"Bigger force + greater distance from the pivot = bigger turning effect."},
+      ]},
+
+    /* ---------------- MOTION ---------------- */
+    motion: { name:"Motion", what:"Graphs, falling, stopping", c:"c4", from:"More motion sheet, Forces sheet, Springs and falling objects sheet (second half)",
+      title:"Moving, falling and stopping", intro:"How things speed up and slow down. Read it off a graph, then explain it with forces.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"Velocity", p:"Speed in a given direction."},
+          {h:"Acceleration", p:"How fast the velocity changes. An unbalanced force causes it."},
+          {h:"Not on the sheets yet", p:"The equations of motion. The More motion sheet names them but doesn’t list any."},
+        ]},
+        {type:"rows", head:"Things to know", tick:"I can do this", items:[
+          {t:"Flat line on a velocity–time graph", aka:"Uniform motion: constant velocity.", e:"Flat means a steady speed. It only means stopped if the line is on zero."},
+          {t:"Sloping line", aka:"Gradient = acceleration. Slowing down is called deceleration.", e:"Up means speeding up. Down means slowing down. Steeper means a bigger acceleration."},
+          {t:"Area under the line", aka:"The sheet calls this displacement.", e:"The area under a velocity–time graph is the distance travelled."},
+          {t:"F = ma", aka:"Newton’s second law.", e:"Bigger force, more acceleration. Bigger mass, less acceleration.", eg:"A full shopping trolley is harder to get moving than an empty one."},
+          {t:"Terminal velocity", e:"A falling object stops speeding up when air resistance grows to match its weight. See the steps below."},
+          {t:"Stopping distance", aka:"Thinking distance + braking distance.", e:"Thinking: the distance covered before you press the brake. Braking: the distance covered while the brakes slow you down.", eg:"Going faster, a wet road or worn brakes all make braking distance longer."},
+        ]},
+        {type:"flow", head:"Falling, in order", steps:[
+          ["Let go","Only weight acts","Unbalanced, so it speeds up. Gravity alone is called free fall."],
+          ["Speeding up","Air resistance grows","The faster it goes, the more air resistance. Still less than weight, so it keeps speeding up."],
+          ["Terminal velocity","Air resistance = weight","Balanced. The resultant is zero, so it falls at a steady speed."],
+        ]},
+        {type:"rows", head:"Worked examples", tick:"I can do this", style:"maths", items:[
+          {t:"Acceleration from a graph", e: s("0 to 12 m/s in 4 s") + s(`gradient = ${f(12,4)}`) + nt("Gradient = change in velocity ÷ time.") + a("= 3 m/s²")},
+          {t:"Distance from a graph", e: s("steady 10 m/s for 6 s") + nt("A rectangle: width × height.") + s("10 × 6") + a("= 60 m") + s("0 to 12 m/s in 4 s") + nt("A triangle: half × width × height.") + s("½ × 4 × 12") + a("= 24 m")},
+          {t:"F = ma", e: s("1200 kg car, a = 2 m/s²") + s("F = 1200 × 2") + a("= 2400 N")},
+          {t:"Stopping distance", e: s("thinking 12 m, braking 24 m") + s("12 + 24") + a("= 36 m")},
+        ]},
+        {type:"remember", text:"On a velocity–time graph, the slope is acceleration and the area is distance."},
+      ]},
+
+    momentum: { name:"Momentum", what:"Mass × velocity, crashes", c:"c5", from:"Momentum sheet",
+      title:"Momentum", intro:"How hard something is to stop. In a crash, the total momentum never changes.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"The rule", p:"momentum = mass × velocity. Unit: kg m/s."},
+          {h:"Direction matters", p:"Pick right as + and left as −."},
+          {h:"In a crash", p:"Total momentum before = total momentum after."},
+        ]},
+        {type:"rows", head:"Things to know", tick:"I can do this", items:[
+          {t:"Momentum", aka:"Often written p = mv. It’s a vector: it has a size and a direction.", e:"Heavier or faster means more momentum, so it’s harder to stop."},
+          {t:"Signs for direction", e:"Say which way is positive before you start. Anything going the other way gets a minus sign."},
+          {t:"Conservation of momentum", aka:"Works in a closed system: nothing outside pushing.", e:"Add up all the momentum before. It equals all the momentum after."},
+          {t:"Newton’s third law", e:"If A pushes on B, B pushes back on A just as hard, the other way.", eg:"Push off from a wall on skates and you roll backwards."},
+          {t:"Explain a safety feature", aka:"Seatbelts, crumple zones, airbags.", e:"Use the three steps below, in that order, every time."},
+          {t:"Grams to kilograms", e:"Mass must be in kg. Divide grams by 1000.", eg:"200 g = 0.2 kg."},
+        ]},
+        {type:"flow", head:"The safety answer, in order", steps:[
+          ["Longer time","It takes longer to stop","The crumple zone crushes, the airbag squashes, the seatbelt stretches."],
+          ["Slower change","Momentum changes more slowly","The same change in momentum, spread over more time."],
+          ["Smaller force","Less force on the people inside","So fewer injuries."],
+        ]},
+        {type:"rows", head:"Worked examples", tick:"I can do this", style:"maths", items:[
+          {t:"Find momentum", e: s("200 g ball at 15 m/s") + s("0.2 kg × 15") + a("= 3 kg m/s") + nt("Grams changed to kilograms first.")},
+          {t:"Two trolleys stick together", e: s("2 kg at 3 m/s hits") + s("1 kg standing still") + s("before: 2 × 3 + 1 × 0") + s("= 6 kg m/s") + s("after: 3 kg at speed v") + s("3 × v = 6") + a("v = 2 m/s")},
+          {t:"Opposite directions", e: s("3 kg at 4 m/s right") + s("2 kg at 3 m/s left") + s("(3 × 4) + (2 × −3)") + s("= 12 − 6") + a("= 6 kg m/s right")},
+        ]},
+        {type:"remember", text:"Safety features: more time to stop, so a slower change in momentum, so a smaller force."},
+      ]},
+
+    /* ---------------- ELECTRICITY ---------------- */
+    circuits: { name:"Circuits", what:"V = IR, Q = It", c:"c6", from:"Calculating I, V and R sheet (given out twice)",
+      title:"Current, voltage and resistance", intro:"Charge flows round a loop. Voltage pushes it and resistance holds it back.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"The three", list:["Current I: charge flowing per second, in amps (A)","Voltage V: the push, in volts (V)","Resistance R: how hard it is to get through, in ohms (Ω)"]},
+          {h:"Two equations", p:"V = I × R and Q = I × t"},
+          {h:"Charge", p:"Measured in coulombs (C). Electrons are negative, protons are positive."},
+        ]},
+        {type:"rows", head:"Things to know", tick:"I can do this", items:[
+          {t:"Ohm’s law", aka:"V = IR.", e:"More push, more current. More resistance, less current."},
+          {t:"Charge and current", aka:"The sheet writes it as I = Q ÷ t.", e:"Current is how much charge goes past each second."},
+          {t:"Series circuit", e:"One loop. The same current goes through everything."},
+          {t:"Parallel circuit", e:"Separate branches. Each branch gets the same voltage."},
+          {t:"Ammeter", e:"Measures current. Goes in series, in the loop itself."},
+          {t:"Voltmeter", e:"Measures voltage. Goes in parallel, alongside the component."},
+        ]},
+        {type:"rows", head:"Worked examples", tick:"I can do this", style:"maths", items:[
+          {t:"Find voltage", e: s("2 A through 6 Ω") + s("V = 2 × 6") + a("= 12 V")},
+          {t:"Find resistance", e: s("12 V, 0.5 A") + s(`R = ${f("V","I")} = ${f(12,0.5)}`) + a("= 24 Ω")},
+          {t:"Find charge", e: s("3 A for 20 s") + s("Q = 3 × 20") + a("= 60 C") + nt("Time must be in seconds: 2 minutes = 120 s.")},
+        ]},
+        {type:"remember", text:"Ammeter in series, in the loop. Voltmeter in parallel, alongside."},
+      ]},
+
+    components: { name:"Components", what:"Diodes, LDRs, I–V graphs", c:"c7", from:"I–V graphs and special resistors sheet",
+      title:"Components and I–V graphs", intro:"Each component has one trick. Its I–V graph shows that trick as a shape.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"I–V graph", p:"Current up the side, voltage along the bottom."},
+          {h:"Straight line through zero", p:"A fixed resistor. Its resistance stays the same."},
+          {h:"Sensors", list:["LDR: brighter light, lower resistance","Thermistor: hotter, lower resistance"]},
+        ]},
+        {type:"rows", head:"Things to know", tick:"I can do this", items:[
+          {t:"Fixed resistor", aka:"An ohmic conductor.", e:"Straight line through the origin. Double the voltage, double the current."},
+          {t:"Diode", e:"Lets current through one way only. Low resistance forwards, very high backwards.", eg:"On its graph the current stays at zero on one side, then shoots up on the other."},
+          {t:"LED", aka:"Light emitting diode.", e:"A diode that lights up. Its symbol is a diode with arrows pointing out."},
+          {t:"Variable resistor", e:"You can turn its resistance up or down.", eg:"A volume knob."},
+          {t:"LDR", aka:"Light dependent resistor.", e:"More light, less resistance.", eg:"Street lights that switch on when it gets dark."},
+          {t:"Thermistor", e:"Hotter, less resistance.", eg:"Thermostats and temperature sensors."},
+        ]},
+        {type:"rows", head:"Worked example", tick:"I can do this", style:"maths", items:[
+          {t:"Resistance from an I–V graph", e: s("at 6 V, I = 0.3 A") + nt("Read both values off the graph.") + s(`R = ${f("V","I")} = ${f(6,0.3)}`) + a("= 20 Ω") + nt("A steeper line means lower resistance.")},
+        ]},
+        {type:"remember", text:"LDR and thermistor: more light or more heat means less resistance."},
+      ]},
+
+    /* ---------------- EXTRAS ---------------- */
+    equations: { name:"One equation shape", c:"tool", title:"Nearly every equation is the same shape",
+      intro:"Seven equations across the sheets, and all seven are “this = that × that”. Learn to rearrange one and you can rearrange them all.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"If A = B × C", list:[`To find B: ${f("A","C")}`,`To find C: ${f("A","B")}`]},
+          {h:"Example", p:"V = I × R, so I = V ÷ R and R = V ÷ I."},
+          {h:"The odd one out", p:"Stopping distance = thinking + braking. That one adds."},
+        ]},
+        {type:"table", cols:["Equation","In words","Units"], srcCol:3, rows:[
+          ["W = m × g","weight = mass × gravity","N = kg × N/kg","Forces"],
+          ["F = k × x","force = spring constant × extension","N = N/m × m","Springs"],
+          ["M = F × d","moment = force × distance","N m = N × m","Moments"],
+          ["F = m × a","force = mass × acceleration","N = kg × m/s²","Motion"],
+          ["p = m × v","momentum = mass × velocity","kg m/s = kg × m/s","Momentum"],
+          ["V = I × R","voltage = current × resistance","V = A × Ω","Circuits"],
+          ["Q = I × t","charge = current × time","C = A × s","Circuits"],
+        ]},
+        {type:"checks", head:"Before you finish a calculation", items:[
+          "I changed units first: cm to m, g to kg, minutes to seconds.",
+          "I wrote the equation in words before putting numbers in.",
+          "My answer has a unit.",
+          "For momentum, I said which direction is positive.",
+        ]},
+        {type:"remember", text:"Write the equation, change the units, put the numbers in, add the unit."},
+      ]},
+
+    graphs: { name:"Reading graphs", c:"tool", title:"Four graphs, two questions",
+      intro:"Every graph on these sheets answers two questions: is it a straight line through zero, and how steep is it?",
+      blocks:[
+        {type:"html", html:`
+<style>
+.gr{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.75rem;margin:0 0 1rem}
+.gr figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.6rem .7rem .7rem}
+.gr svg{display:block;width:100%;height:auto}
+.gr figcaption{font-size:.92rem;color:var(--muted);margin-top:.3rem}
+.gr figcaption b{color:var(--ink)}
+.gr .ax{stroke:var(--muted);stroke-width:1.5;fill:none}
+.gr .ln{stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.gr text{fill:var(--muted);font-size:11px;font-family:var(--sans)}
+</style>
+<div class="gr">
+  <figure>
+    <svg viewBox="0 0 200 140" role="img" aria-label="Velocity–time graph: line rises, stays flat, then falls">
+      <path class="ax" d="M30 10 V115 H192"/>
+      <path class="ln" style="stroke:var(--c4)" d="M30 115 L80 55 L135 55 L180 115"/>
+      <text x="50" y="108">speeding up</text>
+      <text x="90" y="47">steady</text>
+      <text x="122" y="108">slowing</text>
+      <text x="150" y="132">time</text>
+      <text transform="translate(20 62) rotate(-90)" text-anchor="middle">velocity</text>
+    </svg>
+    <figcaption><b>Velocity–time.</b> Slope is acceleration. Area is distance.</figcaption>
+  </figure>
+  <figure>
+    <svg viewBox="0 0 200 140" role="img" aria-label="Force–extension graph: straight line, then a curve">
+      <path class="ax" d="M30 10 V115 H192"/>
+      <path class="ln" style="stroke:var(--c2)" d="M30 115 L120 45 Q150 25 185 20"/>
+      <circle cx="120" cy="45" r="4" style="fill:var(--c2)"/>
+      <text x="122" y="64">Hooke’s law</text><text x="122" y="76">stops here</text>
+      <text x="130" y="132">extension</text>
+      <text transform="translate(20 62) rotate(-90)" text-anchor="middle">force</text>
+    </svg>
+    <figcaption><b>Spring.</b> Straight bit: Hooke’s law. Steeper means a stiffer spring.</figcaption>
+  </figure>
+  <figure>
+    <svg viewBox="0 0 200 140" role="img" aria-label="I–V graph for a fixed resistor: straight line through the origin">
+      <path class="ax" d="M15 70 H190 M100 8 V132"/>
+      <path class="ln" style="stroke:var(--c7)" d="M45 125 L155 15"/>
+      <text x="160" y="85">V</text><text x="106" y="18">I</text>
+    </svg>
+    <figcaption><b>Fixed resistor.</b> Straight through zero. Steeper means less resistance.</figcaption>
+  </figure>
+  <figure>
+    <svg viewBox="0 0 200 140" role="img" aria-label="I–V graph for a diode: flat at zero, then rising steeply">
+      <path class="ax" d="M15 70 H190 M100 8 V132"/>
+      <path class="ln" style="stroke:var(--c7)" d="M18 70 L118 70 C132 70 138 45 146 12"/>
+      <text x="160" y="85">V</text><text x="106" y="18">I</text>
+      <text x="22" y="62">no current</text>
+    </svg>
+    <figcaption><b>Diode.</b> No current one way. Lots the other way.</figcaption>
+  </figure>
+</div>`},
+        {type:"table", cols:["The graph","Straight through zero means","Steeper means"], rows:[
+          ["Velocity–time","steady acceleration from a standstill","bigger acceleration"],
+          ["Force–extension","Hooke’s law: double the force, double the stretch","stiffer spring, bigger k"],
+          ["Current–voltage","fixed resistor: double the voltage, double the current","lower resistance"],
+        ]},
+        {type:"checks", head:"Before you read any graph", items:[
+          "I read what’s on each axis.",
+          "I checked the units on each axis.",
+          "I asked: is it straight, and does it go through zero?",
+        ]},
+        {type:"remember", text:"Straight through zero means directly proportional: double one, and the other doubles."},
+      ]},
+  },
+
+  jargon: {
+    intro: "The sheets use several words for the same thing. Each line below is one idea.",
+    items: [
+      ["Voltage = potential difference = p.d.", "The push that drives current round."],
+      ["Current = flow of charge", "Measured in amps, short for amperes (A)."],
+      ["Resultant force = net force", "What’s left after you add up all the arrows."],
+      ["Balanced forces = equilibrium", "No resultant force, so the motion doesn’t change."],
+      ["Moment = torque = turning effect", "Force × distance from the pivot."],
+      ["Spring constant = stiffness = force constant = k", "How hard a spring is to stretch."],
+      ["Extension = stretch", "How much longer it got, not its new length."],
+      ["Force meter = newton meter = spring balance", "A spring with a scale on it."],
+      ["Directly proportional", "Double one and the other doubles. A straight line through zero."],
+      ["Gradient = slope", "How steep the line is."],
+      ["Deceleration = negative acceleration", "Slowing down."],
+      ["Uniform motion = constant velocity", "Same speed, same direction. Flat on a velocity–time graph."],
+      ["Area under the graph = displacement", "On a velocity–time graph: the distance travelled."],
+      ["Vector", "Has a size and a direction. Velocity and momentum are vectors."],
+      ["Ohmic conductor = fixed resistor", "Its I–V graph is a straight line through zero."],
+      ["Free fall", "Falling with gravity as the only force."],
+    ],
+  },
+};
+
+/* ======================= end of DATA ======================= */
+
+
+/* ---------- engine (shared; don't edit per subject) ---------- */
+(function(){
+  const S = DATA.sections, ids = Object.keys(S);
+  const col = id => `var(--${S[id].c === "tool" ? "c-tool" : S[id].c})`;
+  let ticks = {};
+  try { ticks = JSON.parse(localStorage.getItem(DATA.storageKey) || "{}") || {}; } catch(e) { ticks = {}; }
+  const save = () => { try { localStorage.setItem(DATA.storageKey, JSON.stringify(ticks)); } catch(e){} };
+
+  document.title = DATA.title;
+  document.getElementById("title").innerHTML = DATA.title;
+  document.getElementById("lede").innerHTML = DATA.lede;
+
+  /* nav */
+  const N = DATA.nav, nav = document.getElementById("nav");
+  nav.classList.add("shape-" + N.shape);
+  const nodeBtn = (id, num) => `<button class="node" type="button" style="--c:${col(id)}" data-id="${id}" aria-pressed="false">
+      ${num ? `<span class="num">${num}</span>` : ""}<span class="name">${S[id].name}</span>${S[id].what ? `<span class="what">${S[id].what}</span>` : ""}<span class="dots" aria-hidden="true"></span></button>`;
+  let h = "";
+  if (N.shape === "tree"){
+    const nodes = N.groups[0].nodes;
+    h = `<div class="root"><span>${N.root}</span></div><div class="trunk"></div>
+         <ul class="hang" style="--n:${nodes.length}">${nodes.map(id => `<li>${nodeBtn(id)}</li>`).join("")}</ul>`;
+  } else if (N.shape === "chain"){
+    const nodes = N.groups[0].nodes;
+    h = `${N.caption ? `<p class="cap">${N.caption}</p>` : ""}
+         <ol class="chainrow${N.hub ? " has-hub" : ""}" style="--n:${nodes.length}">${nodes.map((id,i) => `<li>${nodeBtn(id, i+1)}</li>`).join("")}</ol>
+         ${N.hub ? `<div class="trunk"></div><div class="hub">${nodeBtn(N.hub)}</div>` : ""}`;
+  } else {
+    h = `<div class="root"><span>${N.root}</span></div><div class="trunk"></div>
+         <div class="groups" style="--g:${N.groups.length}">${N.groups.map(g => `
+           <div class="group"><div class="glabel"><b>${g.label}</b>${g.sub ? `<span>${g.sub}</span>` : ""}</div><div class="trunk"></div>
+           <ul class="hang" style="--n:${g.nodes.length}">${g.nodes.map(id => `<li>${nodeBtn(id)}</li>`).join("")}</ul></div>`).join("")}</div>`;
+  }
+  h += `<div class="extras">${(N.extras||[]).map(id => `<button class="pill" type="button" style="--c:${col(id)}" data-id="${id}" aria-pressed="false">${S[id].name}</button>`).join("")}</div>`;
+  nav.innerHTML = h;
+
+  /* blocks */
+  const head = b => b.head ? `<h3 class="sub">${b.head}</h3>` : "";
+  const R = {
+    facts: b => `${head(b)}<div class="facts" style="--n:${Math.min(b.cards.length,3)}">${b.cards.map(c => `<div class="fact"><h3>${c.h}</h3>
+        ${c.p ? `<p>${c.p}</p>` : ""}${c.list ? `<ul>${c.list.map(x => `<li>${x}</li>`).join("")}</ul>` : ""}
+        ${c.words ? `<ul class="words">${c.words.map(w => `<li>${w}</li>`).join("")}</ul>` : ""}
+        ${c.badge ? `<p><span class="badge ${c.badge[0]}">${c.badge[1]}</span></p>` : ""}${c.eg ? `<span class="eg">${c.eg}</span>` : ""}</div>`).join("")}</div>`,
+    rows: (b, id, bi) => `${head(b)}<ul class="rows">${b.items.map((r,i) => { const k = `${id}:${bi}:${i}`; return `<li class="row${ticks[k] ? " done" : ""}">
+        <div>${r.lead && r.q ? `<p class="q lead">“${r.q}”</p>${r.aka ? `<span class="aka">${r.aka}</span>` : ""}`
+                             : `<h4>${r.t}</h4>${r.aka ? `<span class="aka">${r.aka}</span>` : ""}${r.q ? `<p class="q">“${r.q}”</p>` : ""}`}</div>
+        <div class="explain${b.style === "maths" ? " maths" : ""}">${b.style === "maths" ? r.e : `<p>${r.e}</p>`}${r.eg ? `<span class="eg">${r.eg}</span>` : ""}${r.m ? `<span class="method">${r.m}</span>` : ""}</div>
+        <label class="tick"><input type="checkbox" data-k="${k}"${ticks[k] ? " checked" : ""}> ${b.tick || "Got it"}</label></li>`; }).join("")}</ul>`,
+    flow: b => `${head(b)}<ol class="flow">${b.steps.map(([t,j,l]) => `<li><div><b>${t}</b>${j ? `<span class="job">${j}</span>` : ""}</div>${l ? `<div class="line">${l}</div>` : "<div></div>"}</li>`).join("")}</ol>`,
+    table: b => `${head(b)}<div class="tbl-wrap"><table class="tbl"><thead><tr>${b.cols.map(c => `<th>${c}</th>`).join("")}</tr></thead>
+        <tbody>${b.rows.map(r => `<tr>${r.map((c,ci) => ci === b.cols.length ? "" : `<td>${c}${ci === 0 && b.srcCol != null && r[b.srcCol] ? `<span class="src">${r[b.srcCol]}</span>` : ""}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`,
+    checks: (b, id, bi) => `${head(b)}<ul class="checks">${b.items.map((c,i) => { const k = `chk:${id}:${bi}:${i}`; return `<li><label><input type="checkbox" data-k="${k}"${ticks[k] ? " checked" : ""}> ${c}</label></li>`; }).join("")}</ul>`,
+    remember: b => `<p class="remember"><strong>${b.label || "Remember"}:</strong> ${b.text}</p>`,
+    html: b => b.html,
+  };
+
+  const panels = document.getElementById("panels");
+  ids.forEach(id => {
+    const sec = S[id], el = document.createElement("section");
+    el.className = "panel"; el.id = "panel-" + id; el.hidden = true; el.style.setProperty("--c", col(id));
+    el.innerHTML = `<div class="panel-head"><h2>${sec.title || sec.name}</h2>${sec.from ? `<span class="from">${sec.from}</span>` : ""}${sec.intro ? `<p>${sec.intro}</p>` : ""}</div>`
+      + (sec.blocks || []).map((b, bi) => R[b.type](b, id, bi)).join("");
+    panels.appendChild(el);
+  });
+
+  /* jargon */
+  const J = DATA.jargon;
+  if (J && J.items && J.items.length){
+    document.getElementById("jargon").innerHTML = `<h2 id="jh">Same thing, different names</h2><p>${J.intro}</p>
+      <dl>${J.items.map(([t,d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join("")}</dl>`;
+  } else document.getElementById("jargon").remove();
+
+  /* dots + routing */
+  const rowKeys = id => (S[id].blocks||[]).flatMap((b,bi) => b.type === "rows" ? b.items.map((_,i) => `${id}:${bi}:${i}`) : []);
+  function drawDots(){
+    nav.querySelectorAll(".node").forEach(btn => {
+      const id = btn.dataset.id, keys = rowKeys(id), done = keys.filter(k => ticks[k]).length;
+      btn.querySelector(".dots").innerHTML = keys.map((_,i) => `<i class="${i < done ? "on" : ""}"></i>`).join("");
+      btn.setAttribute("aria-label", `${S[id].name}: ${done} of ${keys.length} ticked`);
+    });
+  }
+  const first = (N.groups[0] && N.groups[0].nodes[0]) || ids[0];
+  const showAllBtn = document.getElementById("showAll");
+  let showingAll = false;
+  function show(id){
+    showingAll = false; showAllBtn.textContent = "Show everything";
+    if (!ids.includes(id)) id = first;
+    ids.forEach(k => {
+      document.getElementById("panel-" + k).hidden = k !== id;
+      const b = nav.querySelector(`[data-id="${k}"]`); if (b) b.setAttribute("aria-pressed", k === id ? "true" : "false");
+    });
+  }
+  nav.addEventListener("click", e => {
+    const b = e.target.closest("[data-id]"); if (!b) return;
+    if (location.hash === "#" + b.dataset.id) show(b.dataset.id); else location.hash = b.dataset.id;
+  });
+  window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+  panels.addEventListener("change", e => {
+    const k = e.target.dataset.k; if (!k) return;
+    if (e.target.checked) ticks[k] = true; else delete ticks[k];
+    const row = e.target.closest(".row"); if (row) row.classList.toggle("done", e.target.checked);
+    save(); drawDots();
+  });
+  showAllBtn.addEventListener("click", () => {
+    showingAll = !showingAll;
+    if (showingAll){
+      ids.forEach(k => { const p = document.getElementById("panel-" + k); p.hidden = false; p.style.marginBottom = "2.5rem";
+        const b = nav.querySelector(`[data-id="${k}"]`); if (b) b.setAttribute("aria-pressed","false"); });
+      showAllBtn.textContent = "Show one at a time";
+    } else show(location.hash.slice(1));
+  });
+  document.getElementById("reset").addEventListener("click", () => {
+    ticks = {}; save();
+    document.querySelectorAll("input[data-k]").forEach(i => i.checked = false);
+    document.querySelectorAll(".row.done").forEach(r => r.classList.remove("done"));
+    drawDots();
+  });
+  drawDots();
+  show(location.hash.slice(1));
+})();
+</script>
+</body>
+</html>

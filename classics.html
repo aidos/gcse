@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Myth and religion, in two halves</title>
+<!--
+  REVISION MAP BASE TEMPLATE
+  ==========================
+  Everything you change lives in the DATA section inside <script> near the bottom.
+  The CSS and the engine below it are shared across every subject page; leave them alone
+  unless a subject genuinely needs something new (then add it, don't fork it).
+
+  Nav shapes (set DATA.nav.shape):
+    "tree"   : root pill -> one row of branch nodes            (e.g. Maths: 5 big ideas)
+    "chain"  : numbered row of nodes -> optional hub node below (e.g. Inspector Calls: questioning order -> Eva)
+    "groups" : root pill -> labelled groups, each with 2-3 nodes (e.g. English Language: Paper 1 / Paper 2 -> Read / Write)
+  Extras (DATA.nav.extras) render as pills under the shape: cross-cutting views like Themes, Essay, Skills.
+
+  Section blocks (in order, any combination) : see BLOCK TYPES comment in DATA.
+  Only "rows" blocks are tickable; their ticks fill the dots on that section's node.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F0; --surface:#FFFFFF; --ink:#1F2A2E; --muted:#56676C; --line:#C6D2CF; --soft:#E2E9E7;
+  /* six section colours + a neutral for tools/extras */
+  --c1:#3E6FA8; --c2:#2C7F69; --c3:#7454AD; --c4:#AE4459; --c5:#A96A1E; --c6:#7A6A36; --c-tool:#36525E;
+  --sans:"Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
+  --mono:"Atkinson Hyperlegible Mono", ui-monospace, "Consolas", "Menlo", monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+    --c1:#7FA8DA; --c2:#6CC2A8; --c3:#B39AE3; --c4:#E38699; --c5:#E2A85E; --c6:#CDBB86; --c-tool:#A9C3CC;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+  --c1:#7FA8DA; --c2:#6CC2A8; --c3:#B39AE3; --c4:#E38699; --c5:#E2A85E; --c6:#CDBB86; --c-tool:#A9C3CC;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:1.0625rem;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:62rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0 0 .4rem;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 2rem;max-width:42rem}
+
+/* ---------- nav: shared pieces ---------- */
+.root{display:flex;justify-content:center}
+.root span{background:var(--ink);color:var(--bg);font-weight:700;padding:.55rem 1.1rem;border-radius:999px}
+.trunk{width:2px;height:1.4rem;background:var(--line);margin:0 auto}
+.cap{font-size:.9rem;color:var(--muted);margin:0 0 .6rem;text-align:center}
+.node{all:unset;box-sizing:border-box;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.3rem;
+  background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:.75rem .5rem .7rem;transition:border-color .15s, background .15s}
+.node:hover{border-color:var(--c)}
+.node:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.node[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+.node .num{font-size:.8rem;font-weight:700;color:var(--surface);background:var(--c);border-radius:999px;width:1.5rem;height:1.5rem;display:grid;place-items:center}
+.node .name{font-weight:700;color:var(--c);font-size:1.05rem;line-height:1.2}
+.node .what{font-size:.85rem;color:var(--muted);line-height:1.3}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:.15rem}
+.dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--c);display:block}
+.dots i.on{background:var(--c)}
+.extras{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin:1.5rem 0 2.25rem}
+.pill{all:unset;cursor:pointer;box-sizing:border-box;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:.45rem 1rem;font-weight:700;color:var(--c);font-size:.95rem}
+.pill:hover{border-color:var(--c)}
+.pill:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.pill[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+nav:not(:has(.extras:not(:empty))){margin-bottom:2.25rem}
+
+/* row of nodes hanging DOWN from a rail (tree, groups) */
+.hang{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:.75rem;position:relative}
+.hang::before{content:"";position:absolute;top:0;left:calc(50% / var(--n));right:calc(50% / var(--n));height:2px;background:var(--line)}
+.hang>li{position:relative;padding-top:1.3rem;display:flex}
+.hang>li::before{content:"";position:absolute;top:0;left:50%;width:2px;height:1.3rem;background:var(--line)}
+
+/* chain: nodes joined UP into a rail that drops to a hub */
+.chainrow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:.75rem;position:relative}
+.chainrow.has-hub::after{content:"";position:absolute;bottom:0;left:calc(50% / var(--n));right:calc(50% / var(--n));height:2px;background:var(--line)}
+.chainrow>li{position:relative;display:flex}
+.chainrow.has-hub>li{padding-bottom:1.3rem}
+.chainrow.has-hub>li::after{content:"";position:absolute;bottom:0;left:50%;width:2px;height:1.3rem;background:var(--line)}
+.hub{display:flex;justify-content:center}
+.hub .node{flex:0 1 20rem}
+
+/* groups */
+.groups{display:grid;grid-template-columns:repeat(var(--g),1fr);gap:1.5rem;position:relative}
+.groups::before{content:"";position:absolute;top:0;left:calc(50% / var(--g));right:calc(50% / var(--g));height:2px;background:var(--line)}
+.group{position:relative;padding-top:1.4rem}
+.group::before{content:"";position:absolute;top:0;left:50%;width:2px;height:1.4rem;background:var(--line)}
+.glabel{text-align:center;border:2px dashed var(--line);border-radius:12px;padding:.5rem .75rem}
+.glabel b{display:block;font-size:1.1rem}
+.glabel span{font-size:.88rem;color:var(--muted)}
+.group .trunk{height:1.2rem}
+
+@media (max-width:720px){
+  .root{justify-content:flex-start}
+  .trunk{margin-left:1.5rem;height:.9rem}
+  .cap{text-align:left}
+  /* tree + chain become a vertical file-tree */
+  .shape-tree .hang,.shape-chain .chainrow{grid-template-columns:1fr;gap:.6rem;padding-left:1.5rem}
+  .shape-tree .hang::before,.shape-chain .chainrow.has-hub::after{top:0;bottom:0;left:1.5rem;right:auto;width:2px;height:auto}
+  .shape-tree .hang::before{bottom:1.6rem}
+  .shape-tree .hang>li,.shape-chain .chainrow>li{padding:0 0 0 1.25rem}
+  .shape-tree .hang>li::before,.shape-chain .chainrow.has-hub>li::after{top:50%;bottom:auto;left:0;width:1.25rem;height:2px}
+  .shape-tree .node,.shape-chain .node{flex-direction:row;flex-wrap:wrap;text-align:left;align-items:center;padding:.6rem .85rem;gap:.15rem .65rem}
+  .shape-tree .node .what,.shape-chain .node .what{flex:1 1 9rem}
+  .shape-tree .dots,.shape-chain .dots{justify-content:flex-start;flex-basis:100%;margin:0}
+  .hub{justify-content:flex-start}.hub .node{flex:1}
+  /* groups stack, each keeps its own small tree */
+  .shape-groups .root,.shape-groups>.trunk,.groups::before,.group::before{display:none}
+  .groups{grid-template-columns:1fr;gap:1.25rem}
+  .group{padding-top:0}
+  .group .trunk{margin:0 auto}
+  .extras{justify-content:flex-start}
+}
+
+/* ---------- panels ---------- */
+.panel-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem 1rem;margin:0 0 1rem;border-left:5px solid var(--c);padding-left:.85rem}
+.panel-head h2{margin:0;font-size:1.5rem;color:var(--c)}
+.panel-head .from{font-size:.85rem;color:var(--muted)}
+.panel-head p{margin:0;color:var(--muted);flex-basis:100%}
+.sub{font-size:1.1rem;margin:1.5rem 0 .6rem}
+.panel>.sub:first-of-type{margin-top:.5rem}
+
+.facts{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:.75rem;margin:0 0 1rem}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem}
+.fact h3{margin:0 0 .25rem;font-size:.85rem;color:var(--muted);font-weight:400}
+.fact p{margin:0}
+.fact ul:not(.words){margin:.2rem 0 0;padding-left:1.1rem}
+.fact .eg{display:block;margin-top:.4rem;font-size:.92rem;color:var(--muted)}
+.words{display:flex;flex-wrap:wrap;gap:.4rem;margin:.35rem 0 0;padding:0;list-style:none}
+.words li{border:2px solid var(--c);color:var(--c);border-radius:999px;padding:.05rem .6rem;font-weight:700;font-size:.92rem}
+.badge{display:inline-block;font-weight:700;border-radius:999px;padding:.1rem .65rem;font-size:.95rem;border:2px solid currentColor}
+.badge.yes{color:var(--c2)} .badge.no{color:var(--c4)} .badge.part{color:var(--c5)}
+@media (max-width:720px){.facts{grid-template-columns:1fr}}
+
+.rows{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto;gap:.4rem 1.5rem;padding:1rem 1.15rem;border-top:1px solid var(--line);align-items:start}
+.row:first-child{border-top:0}
+.row h4{margin:0;font-size:1.05rem}
+.row .aka{display:block;margin-top:.2rem;font-size:.85rem;color:var(--muted)}
+.row .q{margin:.45rem 0 0;font-style:italic;border-left:3px solid var(--c);padding-left:.7rem}
+.row .q.lead{margin-top:0;font-size:1.08rem}
+.explain{background:var(--soft);border-radius:8px;padding:.6rem .8rem;overflow-x:auto}
+.explain p{margin:0}
+.explain .eg{display:block;margin-top:.35rem;font-size:.92rem;font-style:italic}
+.explain .method{display:block;margin-top:.35rem;font-size:.88rem;color:var(--muted)}
+.explain.maths{font-family:var(--mono);line-height:1.9}
+.explain.maths .step{display:block;white-space:nowrap}
+.explain.maths .ans{font-weight:600;color:var(--c)}
+.explain.maths .note{font-family:var(--sans);font-size:.85rem;color:var(--muted);display:block;line-height:1.4;white-space:normal}
+.tick{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--muted);cursor:pointer;white-space:nowrap;padding-top:.15rem}
+.tick input{width:1.25rem;height:1.25rem;accent-color:var(--c);cursor:pointer;margin:0}
+.row.done h4::after,.row.done .q.lead::after{content:" ✓";font-style:normal;color:var(--c)}
+@media (max-width:720px){
+  .row{grid-template-columns:1fr auto}
+  .row .explain{grid-column:1 / -1;grid-row:2}
+  .row .tick{grid-column:2;grid-row:1}
+}
+
+.flow{list-style:none;margin:0;padding:0;counter-reset:fl;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.flow li{counter-increment:fl;display:grid;grid-template-columns:2.2rem minmax(0,12rem) minmax(0,1fr);gap:.3rem 1rem;padding:.8rem 1.1rem;border-top:1px solid var(--line);align-items:start}
+.flow li:first-child{border-top:0}
+.flow li::before{content:counter(fl);font-weight:700;color:var(--surface);background:var(--c);border-radius:999px;width:1.7rem;height:1.7rem;display:grid;place-items:center;font-size:.9rem}
+.flow b{display:block}
+.flow .job{font-size:.88rem;color:var(--muted)}
+.flow .line{font-style:italic;background:var(--soft);border-radius:8px;padding:.45rem .7rem}
+@media (max-width:620px){.flow li{grid-template-columns:2.2rem 1fr}.flow .line{grid-column:2}}
+
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{text-align:left;padding:.75rem .95rem;border-top:1px solid var(--line);vertical-align:top}
+.tbl thead th{border-top:0;font-size:.9rem;color:var(--muted)}
+.tbl td:first-child{font-weight:700}
+.tbl .src{display:block;font-size:.82rem;color:var(--muted);font-weight:400;margin-top:.15rem}
+
+.checks{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.checks li{border-top:1px solid var(--line);padding:.65rem 1rem}
+.checks li:first-child{border-top:0}
+.checks label{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer}
+.checks input{width:1.2rem;height:1.2rem;margin:.2rem 0 0;accent-color:var(--c);flex:none}
+
+.remember{margin:1rem 0 0;padding:.85rem 1rem;border:2px dashed var(--c);border-radius:12px}
+.remember strong{color:var(--c)}
+
+/* inline helpers usable in any text */
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;margin:0 .1em;font-size:.92em}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .2em}
+.fr>span:last-child{padding:0 .2em}
+sup{font-size:.7em;line-height:0}
+
+/* ---------- jargon + tools ---------- */
+.jargon{margin-top:3rem}
+.jargon h2{font-size:1.3rem;margin:0 0 .3rem}
+.jargon>p{color:var(--muted);margin:0 0 1rem}
+.jargon dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.75rem}
+.jargon div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.75rem .95rem}
+.jargon dt{font-weight:700}
+.jargon dd{margin:.15rem 0 0;color:var(--muted);font-size:.95rem}
+.tools{display:flex;gap:.75rem;flex-wrap:wrap;margin:1.25rem 0 0}
+.btn{all:unset;cursor:pointer;font-size:.9rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem}
+.btn:hover{color:var(--ink);border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  nav,.tools,.tick{display:none!important}
+  .panel{display:block!important;margin-bottom:1.5rem}
+  .row,.flow li{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1 id="title"></h1>
+  <p class="lede" id="lede"></p>
+  <nav id="nav" aria-label="Topics"></nav>
+  <div id="panels"></div>
+  <div class="tools">
+    <button class="btn" id="showAll" type="button">Show everything</button>
+    <button class="btn" id="reset" type="button">Clear my ticks</button>
+  </div>
+  <section class="jargon" id="jargon" aria-labelledby="jh"></section>
+</main>
+
+<script>
+/* ---------- inline helpers for content strings ---------- */
+const f  = (a,b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;   // stacked fraction
+const s  = t => `<span class="step">${t}</span>`;          // maths working line   (use with style:"maths")
+const a  = t => `<span class="step ans">${t}</span>`;      // maths answer line
+const nt = t => `<span class="note">${t}</span>`;          // maths side note
+
+/* =====================================================================
+   DATA : the only part to edit
+   =====================================================================
+   BLOCK TYPES (inside a section's "blocks" array):
+     {type:"facts", head?, cards:[{h, p? , list?:[..], words?:[..], badge?:["yes"|"no"|"part","Label"], eg?}]}
+         2-3 summary cards. words = coloured chips. badge = Accepts/Refuses style label.
+     {type:"rows", head?, tick:"I can do this", style?:"maths", items:[{t, aka?, q?, lead?:true, e, eg?, m?}]}
+         The tickable list. t = title, aka = "Also called…", q = quotation (no quote marks),
+         lead:true shows the quote as the headline instead of t, e = explanation, eg = example, m = method/effect line.
+         style:"maths" puts e in a monospace working box; build e with s()/a()/nt().
+     {type:"flow", head?, steps:[[title, job, exampleLine], …]}   numbered steps: ONLY for real sequences
+     {type:"table", head?, cols:[…], rows:[[…], …], srcCol?:index}  srcCol = small grey note under first cell
+     {type:"checks", head?, items:[…]}                            tickable self-check list (not counted in dots)
+     {type:"remember", label?:"Remember", text}
+     {type:"html", html}                                          escape hatch for a one-off (e.g. an SVG diagram)
+   Colours: c1–c6 for sections, "tool" for extras/cross-cutting views.
+   ===================================================================== */
+/* temple diagrams (CSS variables so dark mode works) */
+const TEMPLE_FRONT = (() => {
+  const cols = Array.from({length:6}, (_,i) => `<rect x="${42 + i*36.8}" y="122" width="16" height="100" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5"/>`).join("");
+  const frieze = Array.from({length:10}, (_,i) => { const x = 30 + i*22; return `<rect x="${x}" y="90" width="8" height="22" fill="var(--line)"/><rect x="${x+8}" y="90" width="14" height="22" fill="color-mix(in srgb, var(--c) 22%, var(--surface))"/>`; }).join("");
+  return `<svg viewBox="0 0 420 260" role="img" aria-labelledby="tf-t" style="width:100%;max-width:26rem;height:auto;font-family:var(--sans)">
+  <title id="tf-t">Front of a Doric temple: triangular pediment on top, a frieze of square panels below it, then six columns standing on steps.</title>
+  <polygon points="30,90 250,90 140,40" fill="var(--soft)" stroke="var(--ink)" stroke-width="1.5"/>
+  ${frieze}<rect x="30" y="90" width="220" height="22" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+  <rect x="30" y="112" width="220" height="10" fill="var(--soft)" stroke="var(--ink)" stroke-width="1.5"/>
+  ${cols}
+  <rect x="22" y="222" width="236" height="10" fill="var(--soft)" stroke="var(--ink)" stroke-width="1.5"/>
+  <rect x="14" y="232" width="252" height="10" fill="var(--soft)" stroke="var(--ink)" stroke-width="1.5"/>
+  <g stroke="var(--muted)" stroke-width="1"><line x1="200" y1="68" x2="268" y2="68"/><line x1="250" y1="101" x2="268" y2="101"/><line x1="240" y1="170" x2="268" y2="170"/></g>
+  <g fill="var(--ink)" font-size="16"><text x="274" y="73" font-weight="700">Pediment</text>
+  <text x="274" y="99" font-weight="700">Frieze</text><text x="274" y="118" font-size="13.5" fill="var(--muted)">Doric: square panels</text><text x="274" y="135" font-size="13.5" fill="var(--muted)">(metopes)</text>
+  <text x="274" y="175" font-weight="700">Columns</text></g>
+</svg>`;
+})();
+
+const TEMPLE_PLAN = (() => {
+  const dots = [];
+  for (let i=0;i<6;i++){ const x = 42 + i*35.2; dots.push([x,32],[x,258]); }
+  for (let j=1;j<10;j++){ const y = 32 + j*22.6; dots.push([42,y],[218,y]); }
+  const d = dots.map(([x,y]) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.5"/>`).join("");
+  return `<svg viewBox="0 0 420 330" role="img" aria-labelledby="tp-t" style="width:100%;max-width:26rem;height:auto;font-family:var(--sans)">
+  <title id="tp-t">Temple seen from above: a ring of columns around a walled building. Inside, the naos holds the god’s statue and the opisthodomos at the back holds treasure. The altar stands outside, in front.</title>
+  <rect x="26" y="18" width="208" height="254" rx="3" fill="var(--soft)" stroke="var(--line)" stroke-width="1.5"/>
+  ${d}
+  <path d="M62 60 H120 M140 60 H198 V230 H140 M120 230 H62 V60 M62 105 H198" fill="none" stroke="var(--ink)" stroke-width="3"/>
+  <rect x="121" y="140" width="18" height="24" rx="2" fill="var(--c)"/>
+  <rect x="118" y="300" width="24" height="14" rx="2" fill="var(--c)"/>
+  <text x="130" y="292" text-anchor="middle" font-size="13.5" fill="var(--muted)">front</text>
+  <g stroke="var(--muted)" stroke-width="1"><line x1="198" y1="82" x2="250" y2="82"/><line x1="139" y1="152" x2="250" y2="152"/><line x1="218" y1="32" x2="250" y2="32"/><line x1="142" y1="307" x2="250" y2="307"/></g>
+  <g fill="var(--ink)" font-size="16">
+    <text x="256" y="37" font-weight="700">Colonnade</text>
+    <text x="256" y="80" font-weight="700">Opisthodomos</text><text x="256" y="96" font-size="13.5" fill="var(--muted)">back room: treasure</text>
+    <text x="256" y="150" font-weight="700">Naos / cella</text><text x="256" y="166" font-size="13.5" fill="var(--muted)">main room: god’s statue</text>
+    <text x="256" y="305" font-weight="700">Altar</text><text x="256" y="321" font-size="13.5" fill="var(--muted)">outside, for sacrifice</text>
+  </g>
+</svg>`;
+})();
+
+const DATA = {
+  storageKey: "revision-map-classciv-myth-religion",
+  title: "Myth and religion, in two halves",
+  lede: "Four key sheets, one subject with two halves. Myth is the stories: the gods, and one hero told two ways. Religion is what people did about the gods: the places, the people and the rituals. Pick a box to start.",
+
+  nav: {
+    shape: "groups",
+    root: "Myth and religion",
+    caption: "",
+    groups: [
+      { label:"Myth", sub:"the stories people told", nodes:["gods","heracles","hercules"] },
+      { label:"Religion", sub:"what people did about it", nodes:["temples","people","rituals"] },
+    ],
+    hub: null,
+    extras: ["bigideas","pairs","answers"],
+  },
+
+  sections: {
+    /* ---------------- MYTH ---------------- */
+    gods: { name:"The gods", what:"who’s who, and how to spot them", c:"c1", from:"Module 1",
+      title:"The gods", intro:"Lots of gods, each with a job and a kit. Learn the kit and you can name any god in a statue or on a pot.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"Many gods", p:"Greeks and Romans believed in many gods. Each one looked after part of life, like the sea or the harvest. That part is the god’s ‘sphere of power’."},
+          {h:"How to spot them", p:"Each god has a kit: objects, animals and a look. Artists used the kit so people knew at once who was shown. That’s ‘iconography’."},
+          {h:"Twelve, or fourteen?", p:"Twelve main gods lived on Mount Olympus. The sheet lists fourteen: Hades lives in the Underworld instead, and Hestia and Dionysus swap in and out of the twelve, depending on the list."},
+        ]},
+        {type:"rows", head:"Who’s who", tick:"I can spot this", items:[
+          {t:"Zeus", aka:"Roman name: Jupiter", e:"King of the gods. Sky, thunder, justice.", eg:"Spot him: lightning bolt, eagle, throne. An older man with a beard."},
+          {t:"Hera", aka:"Roman name: Juno", e:"Queen of the gods. Marriage, women, childbirth.", eg:"Spot her: crown, sceptre, peacock."},
+          {t:"Poseidon", aka:"Roman name: Neptune", e:"Sea, earthquakes, horses.", eg:"Spot him: trident, horses, beard, sea things."},
+          {t:"Demeter", aka:"Roman name: Ceres", e:"Farming, grain, harvest.", eg:"Spot her: bundle of wheat, torch. An older woman."},
+          {t:"Athena", aka:"Roman name: Minerva", e:"Wisdom, war planning, crafts.", eg:"Spot her: helmet, shield, spear, owl. Often in armour."},
+          {t:"Apollo", aka:"Roman name: Apollo too", e:"Music, prophecy, healing, archery, the sun.", eg:"Spot him: lyre, bow, laurel wreath. Young, no beard."},
+          {t:"Artemis", aka:"Roman name: Diana", e:"Hunting, the wild, childbirth, young girls.", eg:"Spot her: bow and arrows, deer. A young woman in a short tunic (chiton)."},
+          {t:"Ares", aka:"Roman name: Mars", e:"War, courage, battle-fury.", eg:"Spot him: spear, shield, helmet. An armed warrior."},
+          {t:"Aphrodite", aka:"Roman name: Venus", e:"Love, beauty, desire.", eg:"Spot her: dove, swan, scallop shell, mirror. Young and elegant."},
+          {t:"Hephaestus", aka:"Roman name: Vulcan", e:"Fire, metalwork, smithing.", eg:"Spot him: hammer, tongs, anvil. Often shown with a limp."},
+          {t:"Hermes", aka:"Roman name: Mercury", e:"Messenger of the gods. Trade, travel, thieves. Guides souls to the Underworld.", eg:"Spot him: winged sandals, caduceus (a staff with two snakes), traveller’s cloak."},
+          {t:"Hestia", aka:"Roman name: Vesta", e:"The hearth (home fire), home life.", eg:"Spot her: a hearth fire. A modest woman wearing a veil."},
+          {t:"Dionysus", aka:"Roman name: Bacchus", e:"Wine, theatre, wild joy, transformation.", eg:"Spot him: ivy wreath, grapevines, thyrsus (a staff topped with a pine cone), leopard skin."},
+          {t:"Hades", aka:"Roman name: Pluto", e:"The Underworld, the dead, wealth.", eg:"Spot him: cornucopia, sceptre, Cerberus (his three-headed dog). A dark-bearded king."},
+        ]},
+        {type:"remember", text:"The kit tells you who. The job tells you why they mattered: Athena isn’t just wise, she’s brains working for the city."},
+      ]},
+
+    heracles: { name:"Heracles", what:"the Greek hero", c:"c2", from:"Module 2",
+      title:"Heracles, the Greek hero", intro:"One hero, famous all over Greece. Know who he is, why he did the Labours, and the two Greek sources that show him.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"Who he is", p:"A demigod: son of Zeus and a mortal woman, Alcmene. A hero is a mortal with links to the gods who does great deeds."},
+          {h:"The Labours", p:"Twelve near-impossible tasks. King Eurystheus set them as a punishment.", eg:"Not on the sheets yet: the twelve Labours one by one."},
+          {h:"Why every Greek claimed him", p:"His Labours took him all over the Greek world, so every city could share him. That makes him pan-Hellenic: belonging to all Greeks."},
+        ]},
+        {type:"rows", head:"The two Greek sources", tick:"I can use this", items:[
+          {t:"The Homeric Hymn to Heracles", aka:"Literary source: a short poem praising him", e:"Calls him Zeus’s son, says he wandered and suffered, and ends with him living with the gods."},
+          {t:"The Temple of Zeus at Olympia", aka:"Visual source: carved on its metopes (square panels)", e:"Twelve panels show the twelve Labours, on his father Zeus’s temple, at a sanctuary all Greeks visited.", eg:"That links his strength to Zeus and to all of Greece."},
+        ]},
+        {type:"rows", head:"Quotes from the Hymn", tick:"I can use this", items:[
+          {t:"Greatest", lead:true, q:"greatest and best of those on earth", e:"The poem puts him above every other mortal.", m:"Use it for: why he’s the top Greek hero."},
+          {t:"Suffering", lead:true, q:"Many things he did that were reckless, many things he suffered", e:"Even a praise poem admits the hard, messy side. Suffering is part of being a hero.", m:"Use it for: endurance."},
+          {t:"Olympus", lead:true, q:"Now, however, in the beautiful abode of snowy Olympus", e:"The poem ends with him living among the gods. The mortal has become divine.", m:"Use it for: linking to his apotheosis in Ovid."},
+        ]},
+        {type:"rows", head:"Explain it", tick:"I can explain this", items:[
+          {t:"Why he’s pan-Hellenic", e:"His stories travelled the whole Greek world, and his Labours were carved at Olympia, where all Greeks gathered."},
+          {t:"What he stands for", e:"Not just strength: endurance, and Greeks united around one shared hero."},
+        ]},
+        {type:"remember", text:"For any Heracles answer, bring one text and one carving: the Hymn and the Olympia metopes."},
+      ]},
+
+    hercules: { name:"Hercules", what:"the Roman hero", c:"c3", from:"Module 3",
+      title:"Hercules, the Roman hero", intro:"Same hero, Roman name, two Roman poets. Virgil makes him Rome’s protector. Ovid shows him suffering, dying and becoming a god.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"Two poets", list:["Virgil, <i>Aeneid</i>: Hercules kills Cacus","Ovid, <i>Metamorphoses</i>: Hercules dies and becomes a god"]},
+          {h:"How they wrote", p:"Both wrote in Latin, in a rhythm called dactylic hexameter: the usual rhythm for long, serious poems."},
+          {h:"Roman values", words:["pietas","virtus","clementia","religio"], eg:"What each means is further down."},
+        ]},
+        {type:"flow", head:"Virgil’s story, in order", steps:[
+          ["Aeneas visits King Evander","Evander, a Greek king, lives on the Palatine Hill by the River Tiber. Aeneas, the Trojan ancestor of the Romans, arrives during a yearly feast for Hercules.",""],
+          ["Cacus steals the cattle","Cacus, a fire-breathing, half-human son of Vulcan, lives in a cave on the Aventine Hill. He steals some of Hercules’ cattle and hides them.",""],
+          ["Hercules kills Cacus","One stolen cow moos back and gives the hiding place away. Hercules tears the top off the cave, leaps through the smoke and flames, and strangles Cacus.",""],
+          ["Rome honours him","The local people set up the Ara Maxima (Great Altar) to Hercules and keep his feast every year. That’s the feast Aeneas walked into.",""],
+        ]},
+        {type:"flow", head:"Ovid’s story, in order", steps:[
+          ["Hercules beats Achelous","He wrestles the river-god to marry Deianira, and snaps off one of his horns. It becomes the cornucopia (horn of plenty).",""],
+          ["Nessus tries to take Deianira","Hercules shoots the centaur with an arrow poisoned with Hydra blood. Dying, Nessus gives Deianira his blood-soaked shirt as a ‘love charm’.",""],
+          ["Deianira hears about Iole","Rumour says Hercules loves Iole. To win him back, Deianira sends him the shirt. She doesn’t know it’s poison.",""],
+          ["The poison burns him","The shirt sticks and burns. He rages in agony on Mount Oeta.",""],
+          ["The pyre","He builds his own funeral pyre on Mount Oeta. Philoctetes lights it and is given Hercules’ bow.",""],
+          ["He becomes a god","The fire burns away his human half. His divine half rises to the stars. That’s his apotheosis.",""],
+        ]},
+        {type:"rows", head:"Quotes to use", tick:"I can use this", items:[
+          {t:"Avenger", lead:true, q:"Hercules, the greatest of avengers", aka:"Virgil", e:"Evander sees him as a rescuer, not just a strongman.", m:"Use it for: Virgil’s Hercules as protector."},
+          {t:"Half-human", lead:true, q:"Cacus, the half-human", aka:"Virgil", e:"The enemy is a monster, so killing him helps everyone.", m:"Use it for: order beating chaos."},
+          {t:"A god", lead:true, q:"the presence and assistance of a god", aka:"Virgil", e:"Evander already treats Hercules as a god who came to help.", m:"Use it for: religio and the Ara Maxima."},
+          {t:"Not tired", lead:true, q:"I am not tired of performing them", aka:"Ovid", e:"Even while dying, he is proud he never gave up on his Labours.", m:"Use it for: endurance and virtus."},
+          {t:"Immortal", lead:true, q:"What he has from me is immortal, deathless and eternal", aka:"Ovid: Jupiter speaking", e:"The fire can only burn his human half.", m:"Use it for: mortal and divine."},
+          {t:"Snake", lead:true, q:"As a snake enjoys its newness, sloughing old age with its skin", aka:"Ovid", e:"He sheds his human body like a snake sheds its skin, and comes out new.", m:"Use it for: transformation, Ovid’s big theme."},
+          {t:"Merit", lead:true, q:"it was given for merit", aka:"Ovid: Jupiter speaking", e:"Becoming a god is a reward he earned.", m:"Use it for: apotheosis as an honour."},
+        ]},
+        {type:"rows", head:"Roman values", tick:"I can use this", items:[
+          {t:"Pietas", aka:"Duty", e:"Doing your duty to the gods, your family and your country.", eg:"Virgil’s Hercules fights for order. Evander’s people keep his feast every year."},
+          {t:"Virtus", aka:"Courage", e:"Bravery, shown by what you do.", eg:"Hercules leaps through the flames to grab Cacus."},
+          {t:"Clementia", aka:"Mercy (the sheet also says self-control)", e:"Mercy and holding back, especially after you’ve won.", eg:"Closest in these stories: Ovid’s Hercules lies calmly on his pyre, like a guest at a feast."},
+          {t:"Religio", aka:"Respect for the gods", e:"Respecting the gods and doing rituals carefully.", eg:"The yearly feast and sacrifices at the Ara Maxima."},
+        ]},
+        {type:"remember", text:"Virgil: Hercules protects Rome. Ovid: Hercules is changed by suffering. Same hero, new values."},
+      ]},
+
+    /* ---------------- RELIGION ---------------- */
+    temples: { name:"Temples", what:"places: the parts of a temple", c:"c4", from:"Module 4",
+      title:"Temples", intro:"A temple was the god’s house, inside a holy area. Learn the parts, then say where each one is and what it’s for.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"Sanctuary", p:"The whole holy area. It holds the temple and the altar. Sacrifices happened at the altar, outside the temple."},
+          {h:"Why build them", p:"To honour the god, and to show off the city’s wealth, power and devotion. Carvings could tell stories too."},
+          {h:"Greek and Roman words", p:"naos (Greek) = cella (Roman): the main room, with the god’s statue."},
+        ]},
+        {type:"html", html:`<div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem;margin:0 0 1rem">
+          <figure style="margin:0;flex:1 1 18rem;max-width:26rem">${TEMPLE_FRONT}<figcaption style="font-size:.88rem;color:var(--muted);margin-top:.3rem">From the front. This one is Doric, so the frieze is split into square panels.</figcaption></figure>
+          <figure style="margin:0;flex:1 1 18rem;max-width:26rem">${TEMPLE_PLAN}<figcaption style="font-size:.88rem;color:var(--muted);margin-top:.3rem">From above. The whole holy area around it is the sanctuary.</figcaption></figure>
+        </div>`},
+        {type:"rows", head:"Parts to spot", tick:"I can spot this", items:[
+          {t:"Pediment", e:"The triangle at each end of the roof. Often filled with sculpture."},
+          {t:"Doric frieze", aka:"Made of metopes (square panels)", e:"The band above the columns, split into square carved panels.", eg:"The Labours at Olympia are on metopes, so that’s a Doric frieze."},
+          {t:"Ionic frieze", e:"One long, unbroken carved strip running round the temple.", eg:"Like a comic strip with no gaps between the pictures."},
+          {t:"Colonnade", e:"A row of columns holding up a roof, making a covered walkway that’s open at the side."},
+          {t:"Semi-engaged column", e:"A column built into a wall, so only half of it sticks out.", eg:"It looks like a column but works as part of the wall."},
+          {t:"Naos / cella", aka:"naos is Greek, cella is Roman", e:"The main room, where the god’s statue stood."},
+          {t:"Opisthodomos", aka:"Say it: o-pis-THOD-o-mos", e:"The back room, where the city kept its treasures."},
+          {t:"Gilding", e:"Covering something with a thin layer of gold.", eg:"A gilded statue looks like solid gold, but isn’t."},
+        ]},
+        {type:"remember", text:"Don’t just name a part: say where it is, what it looks like, and what it’s for."},
+      ]},
+
+    people: { name:"Priests and helpers", what:"people: who does what", c:"c5", from:"Module 4",
+      title:"Priests and helpers", intro:"Rituals had to be done right, so religion needed experts. They do three jobs: run things, read signs, and carry out the sacrifice.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"Run things", words:["hiereus","hiereia","pontifex","Vestal Virgins"]},
+          {h:"Read signs", words:["mantis","augur","haruspex"]},
+          {h:"Carry out the sacrifice", words:["popa","cultrarius"]},
+        ]},
+        {type:"rows", head:"Who does what", tick:"I can explain this", items:[
+          {t:"Hiereus and hiereia", aka:"Plurals: hiereis, hiereiai", e:"A Greek priest (hiereus) or priestess (hiereia). The word means ‘one who sacrifices to a god’."},
+          {t:"Pontifex", aka:"Plural: pontifices", e:"A Roman priest who looked after temples, religious law and the religious calendar."},
+          {t:"Pontifex Maximus", aka:"Greatest pontiff", e:"The head of the pontifices."},
+          {t:"Vestal Virgins", e:"Women priests of Vesta, goddess of the hearth. They made the mola salsa used at sacrifices.", eg:"Vesta is Hestia in Greek, from the gods list."},
+          {t:"Mantis", aka:"Plural: manteis", e:"A Greek seer who read animal insides or bird signs to predict what would happen."},
+          {t:"Augur", aka:"Carries a lituus (a curved staff)", e:"A Roman who read birds: how they flew and behaved."},
+          {t:"Haruspex", aka:"Plural: haruspices", e:"A Roman priest who read the insides of sacrificed animals."},
+          {t:"Popa", e:"A helper at a Roman sacrifice who struck the animal on the head to stun it."},
+          {t:"Cultrarius", e:"A helper at a sacrifice who cut the animal’s throat."},
+        ]},
+        {type:"remember", text:"The Greek mantis reads every kind of sign. Romans split the job: the augur reads birds, the haruspex reads insides."},
+      ]},
+
+    rituals: { name:"Rituals and signs", what:"practices: sacrifice, omens, purity", c:"c6", from:"Module 4",
+      title:"Rituals and signs", intro:"Nearly everything here has one aim: keep the gods on your side. Romans called that the pax deorum, the peace of the gods.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"The goal", p:"Pax deorum: the peace of the gods. A good relationship with the gods kept the city safe."},
+          {h:"The danger", p:"Pollution: doing something that makes you impure in the gods’ eyes. It could upset that peace."},
+          {h:"Done together", p:"Festivals and sacrifices were public. The whole city took part, which bound people together."},
+        ]},
+        {type:"flow", head:"A Roman sacrifice, in order", steps:[
+          ["Prepare the animal","Mola salsa (salt and flour made by the Vestal Virgins) is sprinkled on its head.",""],
+          ["Stun it","The popa strikes it on the head.",""],
+          ["Kill it","The cultrarius cuts its throat.",""],
+          ["Read the signs","A haruspex reads its insides for messages from the gods.",""],
+        ]},
+        {type:"rows", head:"Explain it", tick:"I can explain this", items:[
+          {t:"Blood sacrifice", e:"Killing an animal as a gift to a god.", eg:"Why: to honour the god and keep the relationship good."},
+          {t:"Hecatomb", e:"A huge sacrifice of at least 100 oxen, at big festivals.", eg:"Why: the bigger the sacrifice, the more important the occasion."},
+          {t:"Divination", aka:"Reading signs and omens", e:"Looking for messages from the gods before big decisions.", eg:"Birds (augur), animal insides (haruspex, mantis)."},
+          {t:"Pollution", e:"Being impure in the gods’ eyes because of something you did.", eg:"Why it matters: it could break the peace of the gods."},
+          {t:"Pax deorum", aka:"The peace of the gods", e:"A good relationship between the city and its gods. Every ritual here exists to protect it."},
+        ]},
+        {type:"remember", text:"Don’t just say what happened at a ritual. Say why: to honour a god, to ask for guidance, or to keep the peace of the gods."},
+      ]},
+
+    /* ---------------- EXTRAS ---------------- */
+    bigideas: { name:"Five big ideas", c:"tool", title:"Five big ideas",
+      intro:"The four sheets have 13 ‘key concepts’ and 13 ‘key tips’. Nearly all of them say one of these five things.",
+      blocks:[
+        {type:"table", cols:["Big idea","What it means","Where it shows up"], rows:[
+          ["Many gods, many jobs","Each god looks after part of life and has a kit you can spot them by.","The gods; Vesta and her Vestal Virgins; a temple for each god"],
+          ["Text and picture tell the same story","Every story has something written and something carved or built. Use both.","Heracles: the Hymn and the Olympia metopes. Temples: pediments and friezes"],
+          ["Same hero, new values","Each writer reshapes Hercules to suit their own people.","Greek: endurance, all Greeks. Virgil: duty and order. Ovid: changed by suffering"],
+          ["Human to god","Hercules becomes a god after death: his apotheosis. Ovid’s readers knew Roman rulers could be made gods after death too.","The end of the Hymn; Ovid’s pyre"],
+          ["Religion is the city’s business","Temples, festivals and sacrifices were done together, to keep the gods on the city’s side.","Temples, priests, pax deorum, the Ara Maxima"],
+        ]},
+        {type:"remember", text:"If you can explain these five, you understand the subject. Everything else is names to hang on them."},
+      ]},
+
+    pairs: { name:"Greek and Roman pairs", c:"tool", title:"Greek and Roman pairs",
+      intro:"The sheets say to keep side-by-side notes. Here they are in one place.",
+      blocks:[
+        {type:"table", cols:["Greek","Roman","What it is"], rows:[
+          ["Zeus","Jupiter (or Jove)","King of the gods"],["Hera","Juno","Queen of the gods"],["Poseidon","Neptune","Sea"],
+          ["Demeter","Ceres","Harvest"],["Athena","Minerva","Wisdom, war planning"],["Apollo","Apollo","Music, prophecy, the sun"],
+          ["Artemis","Diana","Hunting"],["Ares","Mars","War"],["Aphrodite","Venus","Love"],
+          ["Hephaestus","Vulcan","Fire, metalwork"],["Hermes","Mercury","Messenger"],["Hestia","Vesta","Hearth and home"],
+          ["Dionysus","Bacchus","Wine, theatre"],["Hades","Pluto","Underworld"],
+          ["Heracles","Hercules","The hero"],
+          ["naos","cella","Room with the god’s statue"],
+          ["hiereus, hiereia","pontifex","Priests (the jobs aren’t identical)"],
+          ["mantis","augur and haruspex","Reading signs: Romans split it into birds and insides"],
+        ]},
+        {type:"remember", text:"Use Greek names for Greek sources and Roman names for Roman ones: Heracles at Olympia, Hercules in Virgil."},
+      ]},
+
+    answers: { name:"Writing good answers", c:"tool", title:"Writing good answers",
+      intro:"The sheets give 13 tips, and many repeat: ‘link to a source’ and ‘explain why, not just what’ are each on three sheets. They boil down to six habits.",
+      blocks:[
+        {type:"table", head:"Your sources so far", cols:["Source","Kind","What it shows"], rows:[
+          ["Homeric Hymn to Heracles","Greek text","Zeus’s son who suffered, then lived with the gods"],
+          ["Temple of Zeus at Olympia","Greek carving (metopes)","The twelve Labours"],
+          ["Virgil, <i>Aeneid</i>","Roman text","Hercules saves Evander’s people from Cacus"],
+          ["Ovid, <i>Metamorphoses</i>","Roman text","Hercules’ death and apotheosis"],
+          ["Ara Maxima","Roman place","Hercules worshipped in Rome"],
+        ]},
+        {type:"checks", head:"Before you finish an answer", items:[
+          "I used a source: a text, a carving or a building. Best of all, one of each.",
+          "I compared Greek and Roman where I could.",
+          "I explained why, not just what.",
+          "My quotes are short, and I said what they show.",
+          "I used the proper word (naos, hecatomb, pax deorum) and showed I know what it means.",
+          "In a Roman answer, I linked to a Roman value: pietas, virtus, clementia or religio.",
+        ]},
+        {type:"remember", text:"One text, one picture, one ‘why’: that’s the shape of a strong answer."},
+      ]},
+  },
+
+  jargon: {
+    intro:"The sheets and the set texts use different words for the same thing.",
+    items: [
+      ["Greek name = Roman name","Zeus = Jupiter, Athena = Minerva, Heracles = Hercules. Same god or hero, two languages."],
+      ["Jupiter = Jove","The set translations often say Jove."],
+      ["Hercules = Alcides = the Tirynthian hero = the Theban","Ovid calls him by family and home-town names. Virgil also calls him Amphitryon’s son."],
+      ["Vulcan = Mulciber","Ovid’s other name for the fire god, used for the flames of the pyre."],
+      ["Spheres of power = details = job","What a god looks after."],
+      ["Iconography = attributes = kit","The objects and look that tell you which god it is."],
+      ["pantheon (small p) = all the gods","Not the Pantheon building in Rome."],
+      ["Pan-Hellenic = for all Greeks","Hellenes means Greeks."],
+      ["Frieze = the band above the columns","Doric: square panels (metopes). Ionic: one continuous strip."],
+      ["naos = cella","The room with the god’s statue."],
+      ["Apotheosis = deification = becoming a god","Ovid’s translation says deification."],
+      ["Metamorphosis = transformation","A change of shape or nature. A transformation myth is a story about one."],
+      ["Cloak (sheet) = shirt (Ovid translation) = tunic","The poisoned gift from Nessus."],
+      ["Ara Maxima = Great Altar = ‘The Mightiest’","Virgil’s translation calls it ‘The Mightiest’. The cult of Hercules is the worship held there."],
+      ["Divination = reading omens = reading signs","Birds, animal insides, and so on."],
+      ["Pax deorum = peace of the gods","A good relationship between the city and its gods."],
+      ["Purpose = meaning = why","Three sheets give this same tip with different titles."],
+      ["Dactylic hexameter = the rhythm of long Greek and Latin poems","Virgil and Ovid both use it."],
+    ],
+  },
+};
+
+/* ======================= end of DATA ======================= */
+
+
+/* ---------- engine (shared; don't edit per subject) ---------- */
+(function(){
+  const S = DATA.sections, ids = Object.keys(S);
+  const col = id => `var(--${S[id].c === "tool" ? "c-tool" : S[id].c})`;
+  let ticks = {};
+  try { ticks = JSON.parse(localStorage.getItem(DATA.storageKey) || "{}") || {}; } catch(e) { ticks = {}; }
+  const save = () => { try { localStorage.setItem(DATA.storageKey, JSON.stringify(ticks)); } catch(e){} };
+
+  document.title = DATA.title;
+  document.getElementById("title").innerHTML = DATA.title;
+  document.getElementById("lede").innerHTML = DATA.lede;
+
+  /* nav */
+  const N = DATA.nav, nav = document.getElementById("nav");
+  nav.classList.add("shape-" + N.shape);
+  const nodeBtn = (id, num) => `<button class="node" type="button" style="--c:${col(id)}" data-id="${id}" aria-pressed="false">
+      ${num ? `<span class="num">${num}</span>` : ""}<span class="name">${S[id].name}</span>${S[id].what ? `<span class="what">${S[id].what}</span>` : ""}<span class="dots" aria-hidden="true"></span></button>`;
+  let h = "";
+  if (N.shape === "tree"){
+    const nodes = N.groups[0].nodes;
+    h = `<div class="root"><span>${N.root}</span></div><div class="trunk"></div>
+         <ul class="hang" style="--n:${nodes.length}">${nodes.map(id => `<li>${nodeBtn(id)}</li>`).join("")}</ul>`;
+  } else if (N.shape === "chain"){
+    const nodes = N.groups[0].nodes;
+    h = `${N.caption ? `<p class="cap">${N.caption}</p>` : ""}
+         <ol class="chainrow${N.hub ? " has-hub" : ""}" style="--n:${nodes.length}">${nodes.map((id,i) => `<li>${nodeBtn(id, i+1)}</li>`).join("")}</ol>
+         ${N.hub ? `<div class="trunk"></div><div class="hub">${nodeBtn(N.hub)}</div>` : ""}`;
+  } else {
+    h = `<div class="root"><span>${N.root}</span></div><div class="trunk"></div>
+         <div class="groups" style="--g:${N.groups.length}">${N.groups.map(g => `
+           <div class="group"><div class="glabel"><b>${g.label}</b>${g.sub ? `<span>${g.sub}</span>` : ""}</div><div class="trunk"></div>
+           <ul class="hang" style="--n:${g.nodes.length}">${g.nodes.map(id => `<li>${nodeBtn(id)}</li>`).join("")}</ul></div>`).join("")}</div>`;
+  }
+  h += `<div class="extras">${(N.extras||[]).map(id => `<button class="pill" type="button" style="--c:${col(id)}" data-id="${id}" aria-pressed="false">${S[id].name}</button>`).join("")}</div>`;
+  nav.innerHTML = h;
+
+  /* blocks */
+  const head = b => b.head ? `<h3 class="sub">${b.head}</h3>` : "";
+  const R = {
+    facts: b => `${head(b)}<div class="facts" style="--n:${Math.min(b.cards.length,3)}">${b.cards.map(c => `<div class="fact"><h3>${c.h}</h3>
+        ${c.p ? `<p>${c.p}</p>` : ""}${c.list ? `<ul>${c.list.map(x => `<li>${x}</li>`).join("")}</ul>` : ""}
+        ${c.words ? `<ul class="words">${c.words.map(w => `<li>${w}</li>`).join("")}</ul>` : ""}
+        ${c.badge ? `<p><span class="badge ${c.badge[0]}">${c.badge[1]}</span></p>` : ""}${c.eg ? `<span class="eg">${c.eg}</span>` : ""}</div>`).join("")}</div>`,
+    rows: (b, id, bi) => `${head(b)}<ul class="rows">${b.items.map((r,i) => { const k = `${id}:${bi}:${i}`; return `<li class="row${ticks[k] ? " done" : ""}">
+        <div>${r.lead && r.q ? `<p class="q lead">“${r.q}”</p>${r.aka ? `<span class="aka">${r.aka}</span>` : ""}`
+                             : `<h4>${r.t}</h4>${r.aka ? `<span class="aka">${r.aka}</span>` : ""}${r.q ? `<p class="q">“${r.q}”</p>` : ""}`}</div>
+        <div class="explain${b.style === "maths" ? " maths" : ""}">${b.style === "maths" ? r.e : `<p>${r.e}</p>`}${r.eg ? `<span class="eg">${r.eg}</span>` : ""}${r.m ? `<span class="method">${r.m}</span>` : ""}</div>
+        <label class="tick"><input type="checkbox" data-k="${k}"${ticks[k] ? " checked" : ""}> ${b.tick || "Got it"}</label></li>`; }).join("")}</ul>`,
+    flow: b => `${head(b)}<ol class="flow">${b.steps.map(([t,j,l]) => `<li><div><b>${t}</b>${j ? `<span class="job">${j}</span>` : ""}</div>${l ? `<div class="line">${l}</div>` : "<div></div>"}</li>`).join("")}</ol>`,
+    table: b => `${head(b)}<div class="tbl-wrap"><table class="tbl"><thead><tr>${b.cols.map(c => `<th>${c}</th>`).join("")}</tr></thead>
+        <tbody>${b.rows.map(r => `<tr>${r.map((c,ci) => ci === b.cols.length ? "" : `<td>${c}${ci === 0 && b.srcCol != null && r[b.srcCol] ? `<span class="src">${r[b.srcCol]}</span>` : ""}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`,
+    checks: (b, id, bi) => `${head(b)}<ul class="checks">${b.items.map((c,i) => { const k = `chk:${id}:${bi}:${i}`; return `<li><label><input type="checkbox" data-k="${k}"${ticks[k] ? " checked" : ""}> ${c}</label></li>`; }).join("")}</ul>`,
+    remember: b => `<p class="remember"><strong>${b.label || "Remember"}:</strong> ${b.text}</p>`,
+    html: b => b.html,
+  };
+
+  const panels = document.getElementById("panels");
+  ids.forEach(id => {
+    const sec = S[id], el = document.createElement("section");
+    el.className = "panel"; el.id = "panel-" + id; el.hidden = true; el.style.setProperty("--c", col(id));
+    el.innerHTML = `<div class="panel-head"><h2>${sec.title || sec.name}</h2>${sec.from ? `<span class="from">${sec.from}</span>` : ""}${sec.intro ? `<p>${sec.intro}</p>` : ""}</div>`
+      + (sec.blocks || []).map((b, bi) => R[b.type](b, id, bi)).join("");
+    panels.appendChild(el);
+  });
+
+  /* jargon */
+  const J = DATA.jargon;
+  if (J && J.items && J.items.length){
+    document.getElementById("jargon").innerHTML = `<h2 id="jh">Same thing, different names</h2><p>${J.intro}</p>
+      <dl>${J.items.map(([t,d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join("")}</dl>`;
+  } else document.getElementById("jargon").remove();
+
+  /* dots + routing */
+  const rowKeys = id => (S[id].blocks||[]).flatMap((b,bi) => b.type === "rows" ? b.items.map((_,i) => `${id}:${bi}:${i}`) : []);
+  function drawDots(){
+    nav.querySelectorAll(".node").forEach(btn => {
+      const id = btn.dataset.id, keys = rowKeys(id), done = keys.filter(k => ticks[k]).length;
+      btn.querySelector(".dots").innerHTML = keys.map((_,i) => `<i class="${i < done ? "on" : ""}"></i>`).join("");
+      btn.setAttribute("aria-label", `${S[id].name}: ${done} of ${keys.length} ticked`);
+    });
+  }
+  const first = (N.groups[0] && N.groups[0].nodes[0]) || ids[0];
+  const showAllBtn = document.getElementById("showAll");
+  let showingAll = false;
+  function show(id){
+    showingAll = false; showAllBtn.textContent = "Show everything";
+    if (!ids.includes(id)) id = first;
+    ids.forEach(k => {
+      document.getElementById("panel-" + k).hidden = k !== id;
+      const b = nav.querySelector(`[data-id="${k}"]`); if (b) b.setAttribute("aria-pressed", k === id ? "true" : "false");
+    });
+  }
+  nav.addEventListener("click", e => {
+    const b = e.target.closest("[data-id]"); if (!b) return;
+    if (location.hash === "#" + b.dataset.id) show(b.dataset.id); else location.hash = b.dataset.id;
+  });
+  window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+  panels.addEventListener("change", e => {
+    const k = e.target.dataset.k; if (!k) return;
+    if (e.target.checked) ticks[k] = true; else delete ticks[k];
+    const row = e.target.closest(".row"); if (row) row.classList.toggle("done", e.target.checked);
+    save(); drawDots();
+  });
+  showAllBtn.addEventListener("click", () => {
+    showingAll = !showingAll;
+    if (showingAll){
+      ids.forEach(k => { const p = document.getElementById("panel-" + k); p.hidden = false; p.style.marginBottom = "2.5rem";
+        const b = nav.querySelector(`[data-id="${k}"]`); if (b) b.setAttribute("aria-pressed","false"); });
+      showAllBtn.textContent = "Show one at a time";
+    } else show(location.hash.slice(1));
+  });
+  document.getElementById("reset").addEventListener("click", () => {
+    ticks = {}; save();
+    document.querySelectorAll("input[data-k]").forEach(i => i.checked = false);
+    document.querySelectorAll(".row.done").forEach(r => r.classList.remove("done"));
+    drawDots();
+  });
+  drawDots();
+  show(location.hash.slice(1));
+})();
+</script>
+</body>
+</html>
