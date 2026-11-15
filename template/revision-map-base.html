@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Revision map</title>
+<!--
+  REVISION MAP BASE TEMPLATE
+  ==========================
+  Everything you change lives in the DATA section inside <script> near the bottom.
+  The CSS and the engine below it are shared across every subject page; leave them alone
+  unless a subject genuinely needs something new (then add it, don't fork it).
+
+  Nav shapes (set DATA.nav.shape):
+    "tree"   : root pill -> one row of branch nodes            (e.g. Maths: 5 big ideas)
+    "chain"  : numbered row of nodes -> optional hub node below (e.g. Inspector Calls: questioning order -> Eva)
+    "groups" : root pill -> labelled groups, each with 2-3 nodes (e.g. English Language: Paper 1 / Paper 2 -> Read / Write)
+  Extras (DATA.nav.extras) render as pills under the shape: cross-cutting views like Themes, Essay, Skills.
+
+  Section blocks (in order, any combination) : see BLOCK TYPES comment in DATA.
+  Only "rows" blocks are tickable; their ticks fill the dots on that section's node.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F0; --surface:#FFFFFF; --ink:#1F2A2E; --muted:#56676C; --line:#C6D2CF; --soft:#E2E9E7;
+  /* six section colours + a neutral for tools/extras */
+  --c1:#3E6FA8; --c2:#2C7F69; --c3:#7454AD; --c4:#AE4459; --c5:#A96A1E; --c6:#7A6A36; --c-tool:#36525E;
+  --sans:"Atkinson Hyperlegible", "Verdana", "Segoe UI", system-ui, sans-serif;
+  --mono:"Atkinson Hyperlegible Mono", ui-monospace, "Consolas", "Menlo", monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+    --c1:#7FA8DA; --c2:#6CC2A8; --c3:#B39AE3; --c4:#E38699; --c5:#E2A85E; --c6:#CDBB86; --c-tool:#A9C3CC;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#162024; --surface:#1E2A2F; --ink:#E5ECEA; --muted:#9DAEB2; --line:#34464C; --soft:#25343A;
+  --c1:#7FA8DA; --c2:#6CC2A8; --c3:#B39AE3; --c4:#E38699; --c5:#E2A85E; --c6:#CDBB86; --c-tool:#A9C3CC;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:1.0625rem;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:62rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0 0 .4rem;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 2rem;max-width:42rem}
+
+/* ---------- nav: shared pieces ---------- */
+.root{display:flex;justify-content:center}
+.root span{background:var(--ink);color:var(--bg);font-weight:700;padding:.55rem 1.1rem;border-radius:999px}
+.trunk{width:2px;height:1.4rem;background:var(--line);margin:0 auto}
+.cap{font-size:.9rem;color:var(--muted);margin:0 0 .6rem;text-align:center}
+.node{all:unset;box-sizing:border-box;cursor:pointer;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.3rem;
+  background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:.75rem .5rem .7rem;transition:border-color .15s, background .15s}
+.node:hover{border-color:var(--c)}
+.node:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.node[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+.node .num{font-size:.8rem;font-weight:700;color:var(--surface);background:var(--c);border-radius:999px;width:1.5rem;height:1.5rem;display:grid;place-items:center}
+.node .name{font-weight:700;color:var(--c);font-size:1.05rem;line-height:1.2}
+.node .what{font-size:.85rem;color:var(--muted);line-height:1.3}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:.15rem}
+.dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--c);display:block}
+.dots i.on{background:var(--c)}
+.extras{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin:1.5rem 0 2.25rem}
+.pill{all:unset;cursor:pointer;box-sizing:border-box;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:.45rem 1rem;font-weight:700;color:var(--c);font-size:.95rem}
+.pill:hover{border-color:var(--c)}
+.pill:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.pill[aria-pressed="true"]{border-color:var(--c);background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+nav:not(:has(.extras:not(:empty))){margin-bottom:2.25rem}
+
+/* row of nodes hanging DOWN from a rail (tree, groups) */
+.hang{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:.75rem;position:relative}
+.hang::before{content:"";position:absolute;top:0;left:calc(50% / var(--n));right:calc(50% / var(--n));height:2px;background:var(--line)}
+.hang>li{position:relative;padding-top:1.3rem;display:flex}
+.hang>li::before{content:"";position:absolute;top:0;left:50%;width:2px;height:1.3rem;background:var(--line)}
+
+/* chain: nodes joined UP into a rail that drops to a hub */
+.chainrow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:.75rem;position:relative}
+.chainrow.has-hub::after{content:"";position:absolute;bottom:0;left:calc(50% / var(--n));right:calc(50% / var(--n));height:2px;background:var(--line)}
+.chainrow>li{position:relative;display:flex}
+.chainrow.has-hub>li{padding-bottom:1.3rem}
+.chainrow.has-hub>li::after{content:"";position:absolute;bottom:0;left:50%;width:2px;height:1.3rem;background:var(--line)}
+.hub{display:flex;justify-content:center}
+.hub .node{flex:0 1 20rem}
+
+/* groups */
+.groups{display:grid;grid-template-columns:repeat(var(--g),1fr);gap:1.5rem;position:relative}
+.groups::before{content:"";position:absolute;top:0;left:calc(50% / var(--g));right:calc(50% / var(--g));height:2px;background:var(--line)}
+.group{position:relative;padding-top:1.4rem}
+.group::before{content:"";position:absolute;top:0;left:50%;width:2px;height:1.4rem;background:var(--line)}
+.glabel{text-align:center;border:2px dashed var(--line);border-radius:12px;padding:.5rem .75rem}
+.glabel b{display:block;font-size:1.1rem}
+.glabel span{font-size:.88rem;color:var(--muted)}
+.group .trunk{height:1.2rem}
+
+@media (max-width:720px){
+  .root{justify-content:flex-start}
+  .trunk{margin-left:1.5rem;height:.9rem}
+  .cap{text-align:left}
+  /* tree + chain become a vertical file-tree */
+  .shape-tree .hang,.shape-chain .chainrow{grid-template-columns:1fr;gap:.6rem;padding-left:1.5rem}
+  .shape-tree .hang::before,.shape-chain .chainrow.has-hub::after{top:0;bottom:0;left:1.5rem;right:auto;width:2px;height:auto}
+  .shape-tree .hang::before{bottom:1.6rem}
+  .shape-tree .hang>li,.shape-chain .chainrow>li{padding:0 0 0 1.25rem}
+  .shape-tree .hang>li::before,.shape-chain .chainrow.has-hub>li::after{top:50%;bottom:auto;left:0;width:1.25rem;height:2px}
+  .shape-tree .node,.shape-chain .node{flex-direction:row;flex-wrap:wrap;text-align:left;align-items:center;padding:.6rem .85rem;gap:.15rem .65rem}
+  .shape-tree .node .what,.shape-chain .node .what{flex:1 1 9rem}
+  .shape-tree .dots,.shape-chain .dots{justify-content:flex-start;flex-basis:100%;margin:0}
+  .hub{justify-content:flex-start}.hub .node{flex:1}
+  /* groups stack, each keeps its own small tree */
+  .shape-groups .root,.shape-groups>.trunk,.groups::before,.group::before{display:none}
+  .groups{grid-template-columns:1fr;gap:1.25rem}
+  .group{padding-top:0}
+  .group .trunk{margin:0 auto}
+  .extras{justify-content:flex-start}
+}
+
+/* ---------- panels ---------- */
+.panel-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem 1rem;margin:0 0 1rem;border-left:5px solid var(--c);padding-left:.85rem}
+.panel-head h2{margin:0;font-size:1.5rem;color:var(--c)}
+.panel-head .from{font-size:.85rem;color:var(--muted)}
+.panel-head p{margin:0;color:var(--muted);flex-basis:100%}
+.sub{font-size:1.1rem;margin:1.5rem 0 .6rem}
+.panel>.sub:first-of-type{margin-top:.5rem}
+
+.facts{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:.75rem;margin:0 0 1rem}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem}
+.fact h3{margin:0 0 .25rem;font-size:.85rem;color:var(--muted);font-weight:400}
+.fact p{margin:0}
+.fact ul:not(.words){margin:.2rem 0 0;padding-left:1.1rem}
+.fact .eg{display:block;margin-top:.4rem;font-size:.92rem;color:var(--muted)}
+.words{display:flex;flex-wrap:wrap;gap:.4rem;margin:.35rem 0 0;padding:0;list-style:none}
+.words li{border:2px solid var(--c);color:var(--c);border-radius:999px;padding:.05rem .6rem;font-weight:700;font-size:.92rem}
+.badge{display:inline-block;font-weight:700;border-radius:999px;padding:.1rem .65rem;font-size:.95rem;border:2px solid currentColor}
+.badge.yes{color:var(--c2)} .badge.no{color:var(--c4)} .badge.part{color:var(--c5)}
+@media (max-width:720px){.facts{grid-template-columns:1fr}}
+
+.rows{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto;gap:.4rem 1.5rem;padding:1rem 1.15rem;border-top:1px solid var(--line);align-items:start}
+.row:first-child{border-top:0}
+.row h4{margin:0;font-size:1.05rem}
+.row .aka{display:block;margin-top:.2rem;font-size:.85rem;color:var(--muted)}
+.row .q{margin:.45rem 0 0;font-style:italic;border-left:3px solid var(--c);padding-left:.7rem}
+.row .q.lead{margin-top:0;font-size:1.08rem}
+.explain{background:var(--soft);border-radius:8px;padding:.6rem .8rem;overflow-x:auto}
+.explain p{margin:0}
+.explain .eg{display:block;margin-top:.35rem;font-size:.92rem;font-style:italic}
+.explain .method{display:block;margin-top:.35rem;font-size:.88rem;color:var(--muted)}
+.explain.maths{font-family:var(--mono);line-height:1.9}
+.explain.maths .step{display:block;white-space:nowrap}
+.explain.maths .ans{font-weight:600;color:var(--c)}
+.explain.maths .note{font-family:var(--sans);font-size:.85rem;color:var(--muted);display:block;line-height:1.4;white-space:normal}
+.tick{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--muted);cursor:pointer;white-space:nowrap;padding-top:.15rem}
+.tick input{width:1.25rem;height:1.25rem;accent-color:var(--c);cursor:pointer;margin:0}
+.row.done h4::after,.row.done .q.lead::after{content:" ✓";font-style:normal;color:var(--c)}
+@media (max-width:720px){
+  .row{grid-template-columns:1fr auto}
+  .row .explain{grid-column:1 / -1;grid-row:2}
+  .row .tick{grid-column:2;grid-row:1}
+}
+
+.flow{list-style:none;margin:0;padding:0;counter-reset:fl;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.flow li{counter-increment:fl;display:grid;grid-template-columns:2.2rem minmax(0,12rem) minmax(0,1fr);gap:.3rem 1rem;padding:.8rem 1.1rem;border-top:1px solid var(--line);align-items:start}
+.flow li:first-child{border-top:0}
+.flow li::before{content:counter(fl);font-weight:700;color:var(--surface);background:var(--c);border-radius:999px;width:1.7rem;height:1.7rem;display:grid;place-items:center;font-size:.9rem}
+.flow b{display:block}
+.flow .job{font-size:.88rem;color:var(--muted)}
+.flow .line{font-style:italic;background:var(--soft);border-radius:8px;padding:.45rem .7rem}
+@media (max-width:620px){.flow li{grid-template-columns:2.2rem 1fr}.flow .line{grid-column:2}}
+
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{text-align:left;padding:.75rem .95rem;border-top:1px solid var(--line);vertical-align:top}
+.tbl thead th{border-top:0;font-size:.9rem;color:var(--muted)}
+.tbl td:first-child{font-weight:700}
+.tbl .src{display:block;font-size:.82rem;color:var(--muted);font-weight:400;margin-top:.15rem}
+
+.checks{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.checks li{border-top:1px solid var(--line);padding:.65rem 1rem}
+.checks li:first-child{border-top:0}
+.checks label{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer}
+.checks input{width:1.2rem;height:1.2rem;margin:.2rem 0 0;accent-color:var(--c);flex:none}
+
+.remember{margin:1rem 0 0;padding:.85rem 1rem;border:2px dashed var(--c);border-radius:12px}
+.remember strong{color:var(--c)}
+
+/* inline helpers usable in any text */
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;margin:0 .1em;font-size:.92em}
+.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .2em}
+.fr>span:last-child{padding:0 .2em}
+sup{font-size:.7em;line-height:0}
+
+/* ---------- jargon + tools ---------- */
+.jargon{margin-top:3rem}
+.jargon h2{font-size:1.3rem;margin:0 0 .3rem}
+.jargon>p{color:var(--muted);margin:0 0 1rem}
+.jargon dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.75rem}
+.jargon div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.75rem .95rem}
+.jargon dt{font-weight:700}
+.jargon dd{margin:.15rem 0 0;color:var(--muted);font-size:.95rem}
+.tools{display:flex;gap:.75rem;flex-wrap:wrap;margin:1.25rem 0 0}
+.btn{all:unset;cursor:pointer;font-size:.9rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem}
+.btn:hover{color:var(--ink);border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  nav,.tools,.tick{display:none!important}
+  .panel{display:block!important;margin-bottom:1.5rem}
+  .row,.flow li{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1 id="title"></h1>
+  <p class="lede" id="lede"></p>
+  <nav id="nav" aria-label="Topics"></nav>
+  <div id="panels"></div>
+  <div class="tools">
+    <button class="btn" id="showAll" type="button">Show everything</button>
+    <button class="btn" id="reset" type="button">Clear my ticks</button>
+  </div>
+  <section class="jargon" id="jargon" aria-labelledby="jh"></section>
+</main>
+
+<script>
+/* ---------- inline helpers for content strings ---------- */
+const f  = (a,b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;   // stacked fraction
+const s  = t => `<span class="step">${t}</span>`;          // maths working line   (use with style:"maths")
+const a  = t => `<span class="step ans">${t}</span>`;      // maths answer line
+const nt = t => `<span class="note">${t}</span>`;          // maths side note
+
+/* =====================================================================
+   DATA : the only part to edit
+   =====================================================================
+   BLOCK TYPES (inside a section's "blocks" array):
+     {type:"facts", head?, cards:[{h, p? , list?:[..], words?:[..], badge?:["yes"|"no"|"part","Label"], eg?}]}
+         2-3 summary cards. words = coloured chips. badge = Accepts/Refuses style label.
+     {type:"rows", head?, tick:"I can do this", style?:"maths", items:[{t, aka?, q?, lead?:true, e, eg?, m?}]}
+         The tickable list. t = title, aka = "Also called…", q = quotation (no quote marks),
+         lead:true shows the quote as the headline instead of t, e = explanation, eg = example, m = method/effect line.
+         style:"maths" puts e in a monospace working box; build e with s()/a()/nt().
+     {type:"flow", head?, steps:[[title, job, exampleLine], …]}   numbered steps: ONLY for real sequences
+     {type:"table", head?, cols:[…], rows:[[…], …], srcCol?:index}  srcCol = small grey note under first cell
+     {type:"checks", head?, items:[…]}                            tickable self-check list (not counted in dots)
+     {type:"remember", label?:"Remember", text}
+     {type:"html", html}                                          escape hatch for a one-off (e.g. an SVG diagram)
+   Colours: c1–c6 for sections, "tool" for extras/cross-cutting views.
+   ===================================================================== */
+const DATA = {
+  storageKey: "revision-map-demo",            // CHANGE per page so ticks don't collide
+  title: "Subject, as a tree",
+  lede: "One or two sentences: what the big shape is, and what to do (pick a branch…).",
+
+  nav: {
+    shape: "groups",                            // "tree" | "chain" | "groups"
+    root: "Subject name",                       // tree + groups
+    caption: "",                                // chain: e.g. "The order the Inspector questions them"
+    groups: [                                   // tree + chain: use ONE group with no label
+      { label:"Group A", sub:"short descriptor", nodes:["alpha","beta"] },
+      { label:"Group B", sub:"short descriptor", nodes:["gamma","delta"] },
+    ],
+    hub: null,                                  // chain only: id of the node everything links down to
+    extras: ["tools"],                          // ids shown as pills below
+  },
+
+  sections: {
+    alpha: { name:"Alpha", what:"short hint", c:"c1", from:"Module 1",
+      title:"Alpha in full", intro:"One sentence on what this branch is about.",
+      blocks:[
+        {type:"facts", cards:[
+          {h:"What it is", p:"Plain-language summary."},
+          {h:"Key words", words:["one","two","three"]},
+          {h:"Do they accept it?", badge:["yes","Accepts"]},
+        ]},
+        {type:"rows", head:"Things to know", tick:"I can do this", items:[
+          {t:"First idea", aka:"Also called something.", e:"One-line rule.", eg:"A tiny example."},
+          {t:"A quote", q:"short exact quotation", e:"What it shows.", m:"Method: what the writer did."},
+        ]},
+        {type:"remember", text:"The single most useful reminder for this branch."},
+      ]},
+    beta:  { name:"Beta", what:"short hint", c:"c2", from:"Module 2", title:"Beta", intro:"…",
+      blocks:[ {type:"rows", tick:"I can do this", style:"maths", items:[
+        {t:"Worked example", e: s(`${f(1,3)} + ${f(1,4)}`) + a(`= ${f(7,12)}`) + nt("Same bottoms first.")},
+      ]} ]},
+    gamma: { name:"Gamma", what:"short hint", c:"c3", from:"Module 3", title:"Gamma", intro:"…",
+      blocks:[ {type:"flow", head:"Steps, in order", steps:[["Plan","0–5 min","Example line"],["Write","5–40 min","…"]]},
+               {type:"rows", tick:"I can do this", items:[{t:"Item", e:"…"}]} ]},
+    delta: { name:"Delta", what:"short hint", c:"c4", from:"Module 4", title:"Delta", intro:"…",
+      blocks:[ {type:"rows", tick:"I can do this", items:[{t:"Item", e:"…"}]} ]},
+    tools: { name:"Cross-cutting view", c:"tool", title:"Spot it, use it", intro:"Where the same idea shows up in two places.",
+      blocks:[ {type:"table", cols:["Idea","Here","There"], srcCol:null, rows:[["Example","in A","in B"]]},
+               {type:"checks", head:"Before you finish", items:["Check one","Check two"]} ]},
+  },
+
+  jargon: {
+    intro: "The sheets use different words for the same thing.",
+    items: [
+      ["Word A = word B", "Plain explanation."],
+      ["Fancy term", "What it actually means."],
+    ],
+  },
+};
+/* ======================= end of DATA ======================= */
+
+
+/* ---------- engine (shared; don't edit per subject) ---------- */
+(function(){
+  const S = DATA.sections, ids = Object.keys(S);
+  const col = id => `var(--${S[id].c === "tool" ? "c-tool" : S[id].c})`;
+  let ticks = {};
+  try { ticks = JSON.parse(localStorage.getItem(DATA.storageKey) || "{}") || {}; } catch(e) { ticks = {}; }
+  const save = () => { try { localStorage.setItem(DATA.storageKey, JSON.stringify(ticks)); } catch(e){} };
+
+  document.title = DATA.title;
+  document.getElementById("title").innerHTML = DATA.title;
+  document.getElementById("lede").innerHTML = DATA.lede;
+
+  /* nav */
+  const N = DATA.nav, nav = document.getElementById("nav");
+  nav.classList.add("shape-" + N.shape);
+  const nodeBtn = (id, num) => `<button class="node" type="button" style="--c:${col(id)}" data-id="${id}" aria-pressed="false">
+      ${num ? `<span class="num">${num}</span>` : ""}<span class="name">${S[id].name}</span>${S[id].what ? `<span class="what">${S[id].what}</span>` : ""}<span class="dots" aria-hidden="true"></span></button>`;
+  let h = "";
+  if (N.shape === "tree"){
+    const nodes = N.groups[0].nodes;
+    h = `<div class="root"><span>${N.root}</span></div><div class="trunk"></div>
+         <ul class="hang" style="--n:${nodes.length}">${nodes.map(id => `<li>${nodeBtn(id)}</li>`).join("")}</ul>`;
+  } else if (N.shape === "chain"){
+    const nodes = N.groups[0].nodes;
+    h = `${N.caption ? `<p class="cap">${N.caption}</p>` : ""}
+         <ol class="chainrow${N.hub ? " has-hub" : ""}" style="--n:${nodes.length}">${nodes.map((id,i) => `<li>${nodeBtn(id, i+1)}</li>`).join("")}</ol>
+         ${N.hub ? `<div class="trunk"></div><div class="hub">${nodeBtn(N.hub)}</div>` : ""}`;
+  } else {
+    h = `<div class="root"><span>${N.root}</span></div><div class="trunk"></div>
+         <div class="groups" style="--g:${N.groups.length}">${N.groups.map(g => `
+           <div class="group"><div class="glabel"><b>${g.label}</b>${g.sub ? `<span>${g.sub}</span>` : ""}</div><div class="trunk"></div>
+           <ul class="hang" style="--n:${g.nodes.length}">${g.nodes.map(id => `<li>${nodeBtn(id)}</li>`).join("")}</ul></div>`).join("")}</div>`;
+  }
+  h += `<div class="extras">${(N.extras||[]).map(id => `<button class="pill" type="button" style="--c:${col(id)}" data-id="${id}" aria-pressed="false">${S[id].name}</button>`).join("")}</div>`;
+  nav.innerHTML = h;
+
+  /* blocks */
+  const head = b => b.head ? `<h3 class="sub">${b.head}</h3>` : "";
+  const R = {
+    facts: b => `${head(b)}<div class="facts" style="--n:${Math.min(b.cards.length,3)}">${b.cards.map(c => `<div class="fact"><h3>${c.h}</h3>
+        ${c.p ? `<p>${c.p}</p>` : ""}${c.list ? `<ul>${c.list.map(x => `<li>${x}</li>`).join("")}</ul>` : ""}
+        ${c.words ? `<ul class="words">${c.words.map(w => `<li>${w}</li>`).join("")}</ul>` : ""}
+        ${c.badge ? `<p><span class="badge ${c.badge[0]}">${c.badge[1]}</span></p>` : ""}${c.eg ? `<span class="eg">${c.eg}</span>` : ""}</div>`).join("")}</div>`,
+    rows: (b, id, bi) => `${head(b)}<ul class="rows">${b.items.map((r,i) => { const k = `${id}:${bi}:${i}`; return `<li class="row${ticks[k] ? " done" : ""}">
+        <div>${r.lead && r.q ? `<p class="q lead">“${r.q}”</p>${r.aka ? `<span class="aka">${r.aka}</span>` : ""}`
+                             : `<h4>${r.t}</h4>${r.aka ? `<span class="aka">${r.aka}</span>` : ""}${r.q ? `<p class="q">“${r.q}”</p>` : ""}`}</div>
+        <div class="explain${b.style === "maths" ? " maths" : ""}">${b.style === "maths" ? r.e : `<p>${r.e}</p>`}${r.eg ? `<span class="eg">${r.eg}</span>` : ""}${r.m ? `<span class="method">${r.m}</span>` : ""}</div>
+        <label class="tick"><input type="checkbox" data-k="${k}"${ticks[k] ? " checked" : ""}> ${b.tick || "Got it"}</label></li>`; }).join("")}</ul>`,
+    flow: b => `${head(b)}<ol class="flow">${b.steps.map(([t,j,l]) => `<li><div><b>${t}</b>${j ? `<span class="job">${j}</span>` : ""}</div>${l ? `<div class="line">${l}</div>` : "<div></div>"}</li>`).join("")}</ol>`,
+    table: b => `${head(b)}<div class="tbl-wrap"><table class="tbl"><thead><tr>${b.cols.map(c => `<th>${c}</th>`).join("")}</tr></thead>
+        <tbody>${b.rows.map(r => `<tr>${r.map((c,ci) => ci === b.cols.length ? "" : `<td>${c}${ci === 0 && b.srcCol != null && r[b.srcCol] ? `<span class="src">${r[b.srcCol]}</span>` : ""}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`,
+    checks: (b, id, bi) => `${head(b)}<ul class="checks">${b.items.map((c,i) => { const k = `chk:${id}:${bi}:${i}`; return `<li><label><input type="checkbox" data-k="${k}"${ticks[k] ? " checked" : ""}> ${c}</label></li>`; }).join("")}</ul>`,
+    remember: b => `<p class="remember"><strong>${b.label || "Remember"}:</strong> ${b.text}</p>`,
+    html: b => b.html,
+  };
+
+  const panels = document.getElementById("panels");
+  ids.forEach(id => {
+    const sec = S[id], el = document.createElement("section");
+    el.className = "panel"; el.id = "panel-" + id; el.hidden = true; el.style.setProperty("--c", col(id));
+    el.innerHTML = `<div class="panel-head"><h2>${sec.title || sec.name}</h2>${sec.from ? `<span class="from">${sec.from}</span>` : ""}${sec.intro ? `<p>${sec.intro}</p>` : ""}</div>`
+      + (sec.blocks || []).map((b, bi) => R[b.type](b, id, bi)).join("");
+    panels.appendChild(el);
+  });
+
+  /* jargon */
+  const J = DATA.jargon;
+  if (J && J.items && J.items.length){
+    document.getElementById("jargon").innerHTML = `<h2 id="jh">Same thing, different names</h2><p>${J.intro}</p>
+      <dl>${J.items.map(([t,d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join("")}</dl>`;
+  } else document.getElementById("jargon").remove();
+
+  /* dots + routing */
+  const rowKeys = id => (S[id].blocks||[]).flatMap((b,bi) => b.type === "rows" ? b.items.map((_,i) => `${id}:${bi}:${i}`) : []);
+  function drawDots(){
+    nav.querySelectorAll(".node").forEach(btn => {
+      const id = btn.dataset.id, keys = rowKeys(id), done = keys.filter(k => ticks[k]).length;
+      btn.querySelector(".dots").innerHTML = keys.map((_,i) => `<i class="${i < done ? "on" : ""}"></i>`).join("");
+      btn.setAttribute("aria-label", `${S[id].name}: ${done} of ${keys.length} ticked`);
+    });
+  }
+  const first = (N.groups[0] && N.groups[0].nodes[0]) || ids[0];
+  const showAllBtn = document.getElementById("showAll");
+  let showingAll = false;
+  function show(id){
+    showingAll = false; showAllBtn.textContent = "Show everything";
+    if (!ids.includes(id)) id = first;
+    ids.forEach(k => {
+      document.getElementById("panel-" + k).hidden = k !== id;
+      const b = nav.querySelector(`[data-id="${k}"]`); if (b) b.setAttribute("aria-pressed", k === id ? "true" : "false");
+    });
+  }
+  nav.addEventListener("click", e => {
+    const b = e.target.closest("[data-id]"); if (!b) return;
+    if (location.hash === "#" + b.dataset.id) show(b.dataset.id); else location.hash = b.dataset.id;
+  });
+  window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+  panels.addEventListener("change", e => {
+    const k = e.target.dataset.k; if (!k) return;
+    if (e.target.checked) ticks[k] = true; else delete ticks[k];
+    const row = e.target.closest(".row"); if (row) row.classList.toggle("done", e.target.checked);
+    save(); drawDots();
+  });
+  showAllBtn.addEventListener("click", () => {
+    showingAll = !showingAll;
+    if (showingAll){
+      ids.forEach(k => { const p = document.getElementById("panel-" + k); p.hidden = false; p.style.marginBottom = "2.5rem";
+        const b = nav.querySelector(`[data-id="${k}"]`); if (b) b.setAttribute("aria-pressed","false"); });
+      showAllBtn.textContent = "Show one at a time";
+    } else show(location.hash.slice(1));
+  });
+  document.getElementById("reset").addEventListener("click", () => {
+    ticks = {}; save();
+    document.querySelectorAll("input[data-k]").forEach(i => i.checked = false);
+    document.querySelectorAll(".row.done").forEach(r => r.classList.remove("done"));
+    drawDots();
+  });
+  drawDots();
+  show(location.hash.slice(1));
+})();
+</script>
+</body>
+</html>
